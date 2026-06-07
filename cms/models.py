@@ -13,6 +13,7 @@ class SiteSettings(models.Model):
     tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     free_shipping_threshold = models.DecimalField(max_digits=10, decimal_places=2, default=50.00)
     is_setup_complete = models.BooleanField(default=False)
+    facial_login_enabled = models.BooleanField(default=True, verbose_name='Enable Facial Login')
 
     class Meta:
         verbose_name = 'Site Settings'

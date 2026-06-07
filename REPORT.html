@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MimicME Shop — Project Report | Trust Management in E-Commerce (428)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  :root {
+    --primary: #6c5ce7;
+    --primary-dark: #5a4bd1;
+    --primary-light: #a29bfe;
+    --accent: #00cec9;
+    --bg: #f8f9fa;
+    --card-bg: #ffffff;
+    --text: #2d3436;
+    --text-light: #636e72;
+    --border: #dfe6e9;
+    --success: #00b894;
+    --warning: #fdcb6e;
+    --danger: #e17055;
+    --shadow: 0 2px 20px rgba(0,0,0,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.7;
+    font-size: 14px;
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  /* Cover Page */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(135deg, var(--primary) 0%, #2d3436 100%);
+    color: #fff;
+    padding: 60px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+    animation: pulse 8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  .cover * { position: relative; z-index: 1; }
+  .cover .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .cover h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+  }
+  .cover .subtitle {
+    font-size: clamp(18px, 2.5vw, 28px);
+    font-weight: 300;
+    opacity: 0.9;
+    margin-bottom: 8px;
+  }
+  .cover .meta {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    font-size: 14px;
+    opacity: 0.8;
+    line-height: 2;
+  }
+  .cover .meta span { display: inline-block; margin: 0 12px; }
+  .cover .meta i { opacity: 0.6; margin-right: 6px; }
+  /* Nav */
+  .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+  }
+  .top-nav .brand { font-weight: 700; color: var(--primary); }
+  .top-nav .spacer { flex: 1; }
+  .top-nav a { color: var(--text-light); text-decoration: none; padding: 4px 10px; border-radius: 6px; }
+  .top-nav a:hover { background: var(--bg); color: var(--primary); }
+  /* Sections */
+  .section {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 32px 40px;
+    margin: 24px 0;
+    box-shadow: var(--shadow);
+    page-break-inside: avoid;
+  }
+  .section h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--primary-light);
+  }
+  .section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 24px 0 12px;
+    color: var(--text);
+  }
+  .section h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 16px 0 8px;
+    color: var(--text);
+  }
+  .section p { margin-bottom: 12px; }
+  .section ul, .section ol { margin: 8px 0 16px 24px; }
+  .section li { margin-bottom: 4px; }
+  .section hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 24px 0;
+  }
+  /* Screenshot placeholder */
+  .screenshot-placeholder {
+    background: linear-gradient(135deg, #f0f0ff, #e8e8ff);
+    border: 2px dashed var(--primary-light);
+    border-radius: 10px;
+    padding: 40px 24px;
+    text-align: center;
+    margin: 20px 0;
+    color: var(--primary);
+  }
+  .screenshot-placeholder .icon {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 10px;
+  }
+  .screenshot-placeholder .label {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .screenshot-placeholder .desc {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-top: 4px;
+  }
+  /* Code blocks */
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 16px 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    margin: 12px 0;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre code { background: transparent; padding: 0; }
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+  }
+  tr:nth-child(even) { background: #f8f9fa; }
+  /* Diagrams */
+  .diagram {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 20px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 12px 0;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  /* Alerts */
+  .alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  .alert-info { background: #e8f4fd; border-left: 4px solid #3498db; color: #1a5276; }
+  .alert-success { background: #e8f8f0; border-left: 4px solid var(--success); color: #0a5e44; }
+  .alert-warning { background: #fef8e7; border-left: 4px solid var(--warning); color: #7d6608; }
+  /* TOC */
+  .toc {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 32px 40px;
+    margin: 24px 0;
+    box-shadow: var(--shadow);
+  }
+  .toc h2 { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 16px; }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 24px;
+  }
+  .toc-item {
+    padding: 4px 0;
+    font-size: 13px;
+  }
+  .toc-item a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .toc-item a:hover { color: var(--primary); }
+  .toc-item .num { color: var(--primary); font-weight: 600; margin-right: 4px; }
+  /* Print */
+  @media print {
+    .top-nav { display: none; }
+    .cover { min-height: 100vh; padding: 60px 24px; }
+    .section { break-inside: avoid; box-shadow: none; border: 1px solid var(--border); }
+    .container { max-width: 100%; }
+    body { background: #fff; font-size: 12px; }
+    pre { font-size: 10px; }
+    @page { margin: 1.5cm; }
+  }
+  /* Responsive */
+  @media (max-width: 768px) {
+    .toc-grid { grid-template-columns: 1fr; }
+    .section { padding: 20px; }
+    .container { padding: 0 12px; }
+  }
+  /* Flow diagram inline */
+  .flow {
+    background: #1e1e2e;
+    color: #a6e3a1;
+    padding: 16px 20px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    margin: 12px 0;
+  }
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .tag-purple { background: #e8e8ff; color: var(--primary); }
+  .tag-green { background: #e8f8f0; color: var(--success); }
+  .tag-orange { background: #fef0e8; color: var(--danger); }
+  .tag-blue { background: #e8f4fd; color: #3498db; }
+</style>
+</head>
+<body>
+
+<!-- Cover -->
+<section class="cover">
+  <div class="badge">Course 428 — Group Project</div>
+  <h1>MimicME Shop</h1>
+  <p class="subtitle">Secure E-Commerce Platform with Biometric Authentication</p>
+  <p class="subtitle" style="font-size:16px;opacity:0.7">Trust Management in E-Commerce</p>
+  <div class="meta">
+    <span><strong>Client:</strong> SmartTrade Africa Ltd</span><br>
+    <span><strong>Course:</strong> Trust Management in E-Commerce (428)</span><br>
+    <span><strong>Assignment:</strong> Group Project</span><br>
+    <span><strong>Submission:</strong> 22/06/2026</span><br>
+    <span><strong>Tech Stack:</strong> Django 5.2 · Python 3.11 · Bootstrap 5 · Stripe API · YOLO · face_recognition</span>
+  </div>
+</section>
+
+<div class="container">
+
+<!-- TOC -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <div class="toc-grid">
+    <div class="toc-item"><a href="#sec1"><span class="num">1.</span> Executive Summary</a></div>
+    <div class="toc-item"><a href="#sec2"><span class="num">2.</span> Project Introduction</a></div>
+    <div class="toc-item"><a href="#sec3"><span class="num">3.</span> System Architecture</a></div>
+    <div class="toc-item"><a href="#sec4"><span class="num">4.</span> User Registration &amp; Authentication</a></div>
+    <div class="toc-item"><a href="#sec5"><span class="num">5.</span> Product Management System</a></div>
+    <div class="toc-item"><a href="#sec6"><span class="num">6.</span> Payment API Integration</a></div>
+    <div class="toc-item"><a href="#sec7"><span class="num">7.</span> Trusted Computing Platform (TCP)</a></div>
+    <div class="toc-item"><a href="#sec8"><span class="num">8.</span> Biometric Authentication</a></div>
+    <div class="toc-item"><a href="#sec9"><span class="num">9.</span> Trust Management Features</a></div>
+    <div class="toc-item"><a href="#sec10"><span class="num">10.</span> Security Requirements</a></div>
+    <div class="toc-item"><a href="#sec11"><span class="num">11.</span> TAM/UTAUT Integration</a></div>
+    <div class="toc-item"><a href="#sec12"><span class="num">12.</span> Vendor Management System</a></div>
+    <div class="toc-item"><a href="#sec13"><span class="num">13.</span> Admin Dashboard &amp; Monitoring</a></div>
+    <div class="toc-item"><a href="#sec14"><span class="num">14.</span> Notification &amp; Support Systems</a></div>
+    <div class="toc-item"><a href="#sec15"><span class="num">15.</span> Content Management System</a></div>
+    <div class="toc-item"><a href="#sec16"><span class="num">16.</span> User Experience (UX) Design</a></div>
+    <div class="toc-item"><a href="#sec17"><span class="num">17.</span> Testing &amp; Quality Assurance</a></div>
+    <div class="toc-item"><a href="#sec18"><span class="num">18.</span> Deployment &amp; Operations</a></div>
+    <div class="toc-item"><a href="#sec19"><span class="num">19.</span> Challenges &amp; Solutions</a></div>
+    <div class="toc-item"><a href="#sec20"><span class="num">20.</span> Conclusion &amp; Recommendations</a></div>
+    <div class="toc-item"><a href="#sec21"><span class="num">21.</span> References</a></div>
+    <div class="toc-item"><a href="#appA"><span class="num">A.</span> Database Schema</a></div>
+    <div class="toc-item"><a href="#appB"><span class="num">B.</span> URL Routes</a></div>
+    <div class="toc-item"><a href="#appC"><span class="num">C.</span> Screenshots Index</a></div>
+  </div>
+</div>
+
+<!-- Section 1 -->
+<section class="section" id="sec1">
+  <h2>1. Executive Summary</h2>
+  <p>SmartTrade Africa Ltd, a rapidly growing digital commerce company, identified critical trust and security challenges including fake customer accounts, online payment fraud, unauthorized access attempts, identity theft, and customer distrust toward online payments. To address these challenges, MimicME Shop was developed as a highly secure and trusted e-commerce platform.</p>
+  <p>This report documents the complete development lifecycle of the MimicME Shop platform, which integrates Trusted Computing Platform (TCP) concepts, facial biometric authentication, secure payment processing via Stripe API, trust management principles, and Technology Acceptance Model (TAM)/UTAUT frameworks. The platform is built using Django 5.2 with Bootstrap 5 frontend, incorporating state-of-the-art liveness detection using YOLO deep learning models and facial recognition using the dlib face_recognition library.</p>
+  <p>Key achievements include the implementation of spoof-proof facial authentication with YOLO-based liveness detection, comprehensive role-based access control (admin, manager, vendor, customer), secure Stripe payment integration with Tanzanian Shilling (TZS) support, an eight-policy trust indicator framework, and a built-in TAM/UTAUT survey system for measuring technology acceptance.</p>
+</section>
+
+<!-- Section 2 -->
+<section class="section" id="sec2">
+  <h2>2. Project Introduction</h2>
+
+  <h3>2.1 Background</h3>
+  <p>SmartTrade Africa Ltd identified several critical challenges in their e-commerce operations:</p>
+  <ul>
+    <li><strong>Fake Customer Accounts:</strong> Malicious actors creating fraudulent accounts for illegal activities</li>
+    <li><strong>Online Payment Fraud:</strong> Unauthorized transactions and chargeback fraud</li>
+    <li><strong>Unauthorized Access:</strong> Account takeover attempts and credential stuffing</li>
+    <li><strong>Identity Theft:</strong> Stolen identities used for fraudulent purchases</li>
+    <li><strong>Customer Distrust:</strong> Users hesitant to transact online due to security concerns</li>
+    <li><strong>Data Privacy Concerns:</strong> Worries about personal and financial data protection</li>
+  </ul>
+
+  <h3>2.2 Objectives</h3>
+  <p>The development of MimicME Shop pursued eight primary objectives:</p>
+  <ol>
+    <li><strong>Secure E-Commerce Platform:</strong> Develop a robust, secure web application for online transactions</li>
+    <li><strong>Trusted Computing Platform (TCP):</strong> Integrate trusted computing mechanisms including secure session management, device trust verification, and secure token handling</li>
+    <li><strong>Biometric Authentication:</strong> Implement facial recognition with liveness detection for user authentication</li>
+    <li><strong>Payment API Integration:</strong> Integrate Stripe payment gateway for secure transaction processing</li>
+    <li><strong>Trust Management:</strong> Apply trust management principles throughout the platform</li>
+    <li><strong>Customer Trust:</strong> Improve user confidence through transparent policies and security indicators</li>
+    <li><strong>TAM/UTAUT Integration:</strong> Apply technology acceptance models to improve adoption</li>
+    <li><strong>Secure Development:</strong> Follow secure coding practices including CSRF protection, XSS prevention, and input validation</li>
+  </ol>
+
+  <h3>2.3 Methodology</h3>
+  <p>The project followed an Agile software development methodology with iterative sprints. Each sprint focused on specific functional areas:</p>
+  <table>
+    <tr><th>Sprint</th><th>Weeks</th><th>Focus Areas</th></tr>
+    <tr><td><span class="tag tag-purple">Sprint 1</span></td><td>1-2</td><td>Project setup, Django configuration, database schema, user authentication, base template</td></tr>
+    <tr><td><span class="tag tag-blue">Sprint 2</span></td><td>3-4</td><td>Product catalog, shopping cart, wishlist, checkout flow, Stripe payment integration</td></tr>
+    <tr><td><span class="tag tag-orange">Sprint 3</span></td><td>5-6</td><td>Vendor management, facial recognition + YOLO liveness, admin dashboard, notifications</td></tr>
+    <tr><td><span class="tag tag-green">Sprint 4</span></td><td>7-8</td><td>Trust indicators, TAM/UTAUT survey, security hardening, activity logging, testing</td></tr>
+  </table>
+
+  <h3>2.4 Scope</h3>
+  <p>The platform encompasses 19 Django applications covering: user registration and authentication (password and biometric), product catalog management with search and filtering, shopping cart and wishlist, secure checkout with Stripe payment, vendor management with commission-based earnings, multi-role access control, facial biometric enrollment with liveness detection, trust indicator framework (8 policy pages), TAM/UTAUT survey system, admin dashboard with dynamic CRUD, notification system, employee payroll, support ticket system, CMS, activity logging, loyalty points, and coupon systems.</p>
+</section>
+
+<!-- Section 3 -->
+<section class="section" id="sec3">
+  <h2>3. System Architecture</h2>
+
+  <h3>3.1 Technology Stack</h3>
+  <table>
+    <tr><th>Layer</th><th>Technology Used</th></tr>
+    <tr><td>Backend Framework</td><td>Django 5.2.14</td></tr>
+    <tr><td>Frontend</td><td>Bootstrap 5.3, Bootstrap Icons, Custom CSS</td></tr>
+    <tr><td>Database</td><td>SQLite (development), PostgreSQL-ready</td></tr>
+    <tr><td>Payment Gateway</td><td>Stripe API (Sandbox/Test Mode)</td></tr>
+    <tr><td>Biometrics</td><td>face_recognition (dlib 128-d embeddings), YOLOv8 (Ultralytics)</td></tr>
+    <tr><td>Image Processing</td><td>OpenCV 4.13</td></tr>
+    <tr><td>Liveness Detection</td><td>YOLOv8 custom model (best.pt)</td></tr>
+    <tr><td>Session Management</td><td>Django Session Framework</td></tr>
+    <tr><td>Password Hashing</td><td>PBKDF2 with SHA-256 (Django default)</td></tr>
+    <tr><td>Python Version</td><td>3.11.9</td></tr>
+  </table>
+
+  <h3>3.2 High-Level Architecture</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128202;</span>
+    <div class="label">Screenshot 3.1: System Architecture Diagram</div>
+    <div class="desc">Insert architecture diagram showing Django MVT pattern with all 19 apps</div>
+  </div>
+
+  <p>The system follows Django's Model-View-Template (MVT) architectural pattern:</p>
+
+  <div class="diagram">┌─────────────────────────────────────────────────────────┐
+│                      Client Browser                      │
+│         (WebRTC Camera, Bootstrap UI, JavaScript)         │
+└────────────────────────┬────────────────────────────────┘
+                         │ HTTPS / HTTP
+┌────────────────────────▼────────────────────────────────┐
+│                   Django WSGI Server                     │
+├─────────────────────────────────────────────────────────┤
+│  Session Middleware → Auth Middleware → CSRF Middleware  │
+├─────────────────────────────────────────────────────────┤
+│   URL Dispatcher (URLconf / urls.py)                    │
+├───────────┬──────────┬──────────┬──────────┬───────────┤
+│ Products  │ Cart      │ Checkout │ Accounts │ Biometric │
+│ Orders    │ Vendor    │ Dashboard│ Payments │ Surveys   │
+│ CMS       │ Support   │ Activity │ Loyalty  │ Shipping  │
+│ Coupons   │ Payroll   │ Notifications                        │
+├───────────┴──────────┴──────────┴──────────┴───────────┤
+│                   Database (SQLite)                       │
+└─────────────────────────────────────────────────────────┘</div>
+
+  <h3>3.3 Application Structure</h3>
+  <p>The project contains 19 custom Django applications:</p>
+  <table>
+    <tr><th>App</th><th>Purpose</th></tr>
+    <tr><td><code>accounts</code></td><td>User authentication, roles, profiles, addresses</td></tr>
+    <tr><td><code>products</code></td><td>Product catalog, categories, brands, reviews</td></tr>
+    <tr><td><code>cart</code></td><td>Shopping cart and wishlist management</td></tr>
+    <tr><td><code>checkout</code></td><td>Checkout process and order creation</td></tr>
+    <tr><td><code>orders</code></td><td>Order management, refunds, returns</td></tr>
+    <tr><td><code>vendor</code></td><td>Vendor registration, products, earnings</td></tr>
+    <tr><td><code>biometric</code></td><td>Facial recognition enrollment and verification</td></tr>
+    <tr><td><code>payment</code></td><td>Transaction recording</td></tr>
+    <tr><td><code>shipping</code></td><td>Shipping zones, rates, tracking</td></tr>
+    <tr><td><code>notifications</code></td><td>In-app notification system</td></tr>
+    <tr><td><code>cms</code></td><td>Site settings, banners, FAQs, policy pages</td></tr>
+    <tr><td><code>support</code></td><td>Customer support ticketing</td></tr>
+    <tr><td><code>activity</code></td><td>Audit trail and activity logging</td></tr>
+    <tr><td><code>loyalty</code></td><td>Customer loyalty points</td></tr>
+    <tr><td><code>payroll</code></td><td>Employee payroll and attendance</td></tr>
+    <tr><td><code>dashboard</code></td><td>Admin/manager dashboard with dynamic CRUD</td></tr>
+    <tr><td><code>surveys</code></td><td>TAM/UTAUT technology acceptance survey</td></tr>
+    <tr><td><code>coupons</code></td><td>Discount coupons</td></tr>
+  </table>
+
+  <h3>3.4 Database Design</h3>
+  <p>The database schema follows Django's ORM conventions using SQLite for development with PostgreSQL-ready configuration. The schema consists of 36+ models across 19 applications.</p>
+  <table>
+    <tr><th>Group</th><th>Models</th></tr>
+    <tr><td>Core E-Commerce</td><td><code>Product</code> → <code>Category</code>, <code>Brand</code>, <code>ProductImage</code>, <code>ProductVariation</code>, <code>ProductReview</code>, <code>Cart</code> → <code>CartItem</code>, <code>Wishlist</code>, <code>Order</code> → <code>OrderItem</code>, <code>Refund</code>, <code>Return</code>, <code>Transaction</code></td></tr>
+    <tr><td>User &amp; Identity</td><td><code>User</code> → <code>UserProfile</code>, <code>Address</code>, <code>EmployeeProfile</code>, <code>FaceDescriptor</code> → <code>BiometricSession</code></td></tr>
+    <tr><td>Business</td><td><code>Vendor</code> → <code>VendorPayout</code>, <code>Withdrawal</code>, <code>Coupon</code>, <code>ShippingZone</code> → <code>ShippingRate</code> → <code>Shipment</code>, <code>Payroll</code> → <code>Attendance</code>, <code>SalarySlip</code></td></tr>
+    <tr><td>Trust &amp; Compliance</td><td><code>TamUtautSurvey</code> → <code>TrustMetric</code>, <code>SupportTicket</code> → <code>TicketReply</code>, <code>ActivityLog</code>, <code>Notification</code></td></tr>
+    <tr><td>Content</td><td><code>SiteSettings</code>, <code>Banner</code>, <code>FAQ</code>, <code>CMSPage</code></td></tr>
+  </table>
+</section>
+
+<!-- Section 4 -->
+<section class="section" id="sec4">
+  <h2>4. User Registration and Authentication</h2>
+
+  <h3>4.1 Registration Flow</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 4.1: Sign Up Page</div>
+    <div class="desc">Registration form with personal info, address, and terms acceptance</div>
+  </div>
+
+  <p>The registration process collects comprehensive user information including personal details (first name, last name, email, phone, username), password with Django's built-in validation (minimum length, complexity, common password checks, similarity checks), address information (street, city, country, postal code), and agreements acceptance (Terms &amp; Conditions, Privacy Policy).</p>
+
+  <pre>def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # Auto-login after registration
+            messages.success(request, 'Account created successfully!')
+            return redirect('product_list')
+    else:
+        form = SignUpForm()
+    return render(request, 'accounts/signup.html', {'form': form})</pre>
+
+  <p>The <code>SignUpForm</code> extends Django's <code>UserCreationForm</code> with automatic <code>UserProfile</code> creation via <code>post_save</code> signal, automatic <code>Address</code> creation with shipping address, and terms acceptance validation.</p>
+
+  <h3>4.2 Login System</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 4.2: Login Page</div>
+    <div class="desc">Login form with OR divider and "Login with Face" button</div>
+  </div>
+
+  <p>The login page provides two authentication options:</p>
+  <ol>
+    <li><strong>Password Login:</strong> Traditional username and password authentication using Django's built-in <code>LoginView</code></li>
+    <li><strong>Facial Login:</strong> Biometric authentication via camera capture (see Section 8)</li>
+  </ol>
+  <p>Additional features: password reset link (full workflow with email token), registration link, and an OR divider with "Login with Face" alternative.</p>
+
+  <h3>4.3 Password Reset Flow</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 4.3: Password Reset Page</div>
+    <div class="desc">Email input for password reset request</div>
+  </div>
+
+  <p>Django's built-in password reset system is fully integrated: user requests reset via email → token-based link sent → secure token validation (time-limited, one-time use) → new password set with validation → confirmation message displayed.</p>
+
+  <h3>4.4 Session Management</h3>
+  <ul>
+    <li><strong>Middleware:</strong> Django session middleware manages user sessions</li>
+    <li><strong>Duration:</strong> <code>SESSION_COOKIE_AGE</code> = 1,209,600 seconds (14 days)</li>
+    <li><strong>Persistence:</strong> <code>SESSION_EXPIRE_AT_BROWSER_CLOSE</code> = False (persistent sessions)</li>
+    <li><strong>Verification:</strong> Session-based <code>face_verified</code> key set after biometric verification</li>
+  </ul>
+
+  <h3>4.5 Multi-Factor Authentication Options</h3>
+  <p>The platform supports a two-factor authentication model:</p>
+  <table>
+    <tr><th>Factor</th><th>Type</th><th>Implementation</th></tr>
+    <tr><td>Factor 1</td><td>Knowledge (Password)</td><td>Username + password via Django <code>AuthenticationBackend</code>, PBKDF2 hashing with SHA-256</td></tr>
+    <tr><td>Factor 2</td><td>Biometric (Face)</td><td>Facial recognition + YOLO liveness detection</td></tr>
+  </table>
+  <table>
+    <tr><th>Method</th><th>Factors</th><th>Use Case</th></tr>
+    <tr><td>Standard Login</td><td>Password</td><td>Regular access</td></tr>
+    <tr><td>Facial Login</td><td>Face + Liveness</td><td>Quick access</td></tr>
+    <tr><td>Multi-Factor</td><td>Password + Face</td><td>High-security actions</td></tr>
+  </table>
+</section>
+
+<!-- Section 5 -->
+<section class="section" id="sec5">
+  <h2>5. Product Management System</h2>
+
+  <h3>5.1 Product Catalog</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 5.1: Product Listing Page</div>
+    <div class="desc">Product grid with category sidebar, search, and sorting</div>
+  </div>
+
+  <p>The product catalog provides: category filtering with sidebar, full-text search on name and description, sorting by price (ascending/descending), name, and newest first, product cards displaying image, name, price, stock status, brand, and category, and a responsive Bootstrap grid.</p>
+
+  <div class="diagram">Category (name, slug)
+    └── Product (name, slug, description, price, stock, image)
+            ├── ProductImage (additional images, primary flag)
+            ├── ProductVariation (size, color, SKU, price adjustment)
+            ├── ProductReview (rating 1-5, comment, approval)
+            └── Brand (name, logo, description)</div>
+
+  <h3>5.2 Product Detail</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 5.2: Product Detail Page</div>
+    <div class="desc">Full product page with images, reviews, and add-to-cart</div>
+  </div>
+
+  <p>Each product detail page includes: large product image with gallery, brand and category badges, price display in TZS, stock status indicator (In Stock / Low Stock / Out of Stock), quantity selector with stock validation, Add to Cart and Add to Wishlist buttons, customer reviews with average rating, and related products.</p>
+
+  <h3>5.3 Shopping Cart</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 5.3: Shopping Cart</div>
+    <div class="desc">Cart with items, quantity update, and order summary</div>
+  </div>
+
+  <p>The cart system features: session-based cart persistent across login/logout via database, quantity update and item removal, running subtotal calculation, order summary with free shipping threshold indicator, and checkout button.</p>
+
+  <pre>POST /cart/add/&lt;product_id&gt;/     → Add item
+POST /cart/update/&lt;product_id&gt;/  → Update quantity
+GET  /cart/remove/&lt;product_id&gt;/  → Remove item
+GET  /cart/                      → View cart</pre>
+
+  <h3>5.4 Wishlist</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 5.4: Wishlist Page</div>
+    <div class="desc">Wishlisted products grid with add-to-cart option</div>
+  </div>
+
+  <p>Wishlist functionality allows users to save products for future purchase, view all wishlisted items in a grid layout, add items directly to cart from wishlist, and remove items.</p>
+
+  <h3>5.5 Product Reviews</h3>
+  <p>Star rating system (1-5), text review comments, admin approval required for public display, average rating computed and displayed, top 10 approved reviews shown on product page.</p>
+</section>
+
+<!-- Section 6 -->
+<section class="section" id="sec6">
+  <h2>6. Payment API Integration</h2>
+
+  <h3>6.1 Stripe Integration</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 6.1: Stripe Checkout Page</div>
+    <div class="desc">Stripe-hosted payment page with card details</div>
+  </div>
+
+  <p>The platform integrates Stripe Payment Gateway in sandbox/test mode. Stripe is a PCI DSS compliant payment processor that handles all sensitive card data, ensuring the platform never stores credit card information.</p>
+
+  <pre>stripe.api_key = settings.STRIPE_SECRET_KEY
+checkout_session = stripe.checkout.Session.create(
+    payment_method_types=['card'],
+    line_items=[{
+        'price_data': {
+            'currency': 'tzs',
+            'product_data': {'name': item.product.name},
+            'unit_amount': int(item.price * 100),
+        },
+        'quantity': item.quantity,
+    } for item in cart_items],
+    mode='payment',
+    success_url=request.build_absolute_uri(
+        reverse('checkout_success', args=[order.id])),
+    cancel_url=request.build_absolute_uri(
+        reverse('checkout_cancel')),
+)</pre>
+
+  <h3>6.2 Payment Flow</h3>
+  <div class="flow">1. Cart → Checkout Form (shipping details)
+2. Order + OrderItems created in database
+3. Stripe Checkout Session created with line items
+4. User redirected to Stripe-hosted payment page
+5. Payment processed by Stripe (sandbox)
+6. Success: Order marked as paid, cart cleared
+7. Cancel: Order preserved, user returned to cart</div>
+
+  <h3>6.3 Transaction Recording</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 6.2: Transaction Record</div>
+    <div class="desc">Payment success page with order number and transaction details</div>
+  </div>
+
+  <p>All transactions are recorded in the <code>Transaction</code> model tracking order, user, amount, payment method (stripe, paypal, mobile_money), status (pending, completed, failed, refunded), and transaction ID.</p>
+
+  <h3>6.4 Payment Security</h3>
+  <ul>
+    <li><strong>No sensitive data stored:</strong> Stripe handles all card data (PCI DSS compliant)</li>
+    <li><strong>Secure tokens:</strong> Only Stripe session IDs stored in database</li>
+    <li><strong>HTTPS required:</strong> All payment communications encrypted</li>
+    <li><strong>Sandbox mode:</strong> Test keys used for development (no real transactions)</li>
+    <li><strong>Status tracking:</strong> Complete payment lifecycle tracked</li>
+  </ul>
+</section>
+
+<!-- Section 7 -->
+<section class="section" id="sec7">
+  <h2>7. Trusted Computing Platform (TCP) Integration</h2>
+
+  <h3>7.1 Secure Session Management</h3>
+  <ul>
+    <li><strong>Django Session Middleware:</strong> Signed session cookies prevent tampering</li>
+    <li><strong>Session Authentication Backend:</strong> Verifies user identity on each request</li>
+    <li><strong>Session Expiry:</strong> Configurable timeout for inactive sessions</li>
+    <li><strong>Secure Token Handling:</strong> CSRF tokens for all state-changing operations</li>
+  </ul>
+
+  <h3>7.2 Device Trust Verification</h3>
+  <p>The platform implements device trust through biometric session tracking via the <code>BiometricSession</code> model, session-based <code>face_verified</code> flag, and login location tracking with IP addresses logged in <code>ActivityLog</code>.</p>
+
+  <h3>7.3 Secure Token Handling</h3>
+  <table>
+    <tr><th>Token Type</th><th>Purpose</th><th>Security Measure</th></tr>
+    <tr><td>CSRF Token</td><td>Form submission protection</td><td>Per-session rotated token</td></tr>
+    <tr><td>Session ID</td><td>User session identification</td><td>Signed cookie, HTTP-only</td></tr>
+    <tr><td>Stripe Session</td><td>Payment processing</td><td>Server-side secret key</td></tr>
+    <tr><td>Password Reset Token</td><td>Account recovery</td><td>Time-limited, single-use</td></tr>
+  </table>
+
+  <h3>7.4 Secure Communication Channels</h3>
+  <ul>
+    <li><strong>SecurityMiddleware:</strong> Headers for content security</li>
+    <li><strong>X-Frame-Options:</strong> DENY (clickjacking protection)</li>
+    <li><strong>CSRF Protection:</strong> Cross-Site Request Forgery prevention</li>
+    <li><strong>XSS Protection:</strong> Django template auto-escaping</li>
+  </ul>
+
+  <h3>7.5 Trusted Login Validation</h3>
+  <p>The multi-layered authentication system provides defense in depth:</p>
+  <div class="flow">Layer 1: Password Authentication (username + password + hashing)
+Layer 2: Biometric Verification (facial recognition + liveness detection)
+Layer 3: Session Management (signed cookies, expiry, CSRF)
+Layer 4: Role-Based Access (RBAC with 4 roles)
+Layer 5: Activity Monitoring (audit log of all actions)</div>
+</section>
+
+<!-- Section 8 - The most important section -->
+<section class="section" id="sec8">
+  <h2>8. Biometric Authentication (Facial Recognition)</h2>
+
+  <h3>8.1 System Architecture</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 8.1: Face Enrollment Page</div>
+    <div class="desc">Camera view with enrollment button and instructions</div>
+  </div>
+
+  <p>The biometric authentication system uses a sophisticated pipeline combining deep learning for face recognition and liveness detection:</p>
+
+  <div class="flow">Webcam Capture → Base64 JPEG → Server Decode (OpenCV)
+    → YOLO Liveness Check (fake/real, confidence ≥ 0.8)
+    → Face Detection (face_recognition.face_locations)
+    → Feature Extraction (128-d embedding)
+    → Comparison (face_distance / compare_faces)
+    → Authentication Decision</div>
+
+  <h3>8.2 Liveness Detection</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 8.2: Liveness Detection In Action</div>
+    <div class="desc">Scan line animation overlaying face during liveness check</div>
+  </div>
+
+  <p>The YOLOv8-based liveness detection model prevents spoofing attacks:</p>
+
+  <pre>def _liveness_check(img):
+    if liveness_model is None:
+        return True  # Graceful degradation
+    results = liveness_model(img, stream=False, verbose=False)
+    for r in results:
+        for box in r.boxes:
+            conf = math.ceil((box.conf[0] * 100)) / 100
+            cls = int(box.cls[0])
+            if conf > 0.8 and liveness_classNames[cls] == 'real':
+                return True
+    return False</pre>
+
+  <table>
+    <tr><th>Parameter</th><th>Value</th></tr>
+    <tr><td>Model</td><td>Custom-trained YOLOv8 (Ultralytics)</td></tr>
+    <tr><td>Classes</td><td>"fake" (0), "real" (1)</td></tr>
+    <tr><td>Confidence Threshold</td><td>≥ 0.8</td></tr>
+    <tr><td>Model Location</td><td><code>biometric/Liveness_detection_models/best.pt</code></td></tr>
+    <tr><td>Graceful Degradation</td><td>Liveness check skipped if model fails to load</td></tr>
+  </table>
+
+  <h3>8.3 Face Encoding Process</h3>
+  <p>The <code>face_recognition</code> library generates 128-dimensional embeddings using dlib's ResNet-34 model:</p>
+
+  <pre>def _get_encoding_from_image(img):
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    face_locations = face_recognition.face_locations(img_rgb)
+    if not face_locations:
+        return None
+    encodings = face_recognition.face_encodings(img_rgb, face_locations)
+    return encodings[0] if encodings else None</pre>
+
+  <h3>8.4 Enrollment Flow</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 8.3: Enrollment Success</div>
+    <div class="desc">Success message with green indicator after face enrollment</div>
+  </div>
+
+  <div class="flow">User logs in → Profile → "Enroll Face"
+    → Start Camera → Position Face → Capture
+    → Liveness Check → Extract Encoding
+    → Store in FaceDescriptor (base64-encoded pickle)
+    → Success Message</div>
+
+  <pre># Encoding (save):
+encoding = face_recognition.face_encodings(img_rgb, face_locations)[0]
+encoded_bytes = base64.b64encode(pickle.dumps(encoding)).decode('ascii')
+descriptor.embedding = encoded_bytes
+
+# Decoding (verify):
+stored_encoding = pickle.loads(base64.b64decode(descriptor.embedding))
+matches = face_recognition.compare_faces([stored_encoding], live_encoding)</pre>
+
+  <h3>8.5 Facial Login Flow</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 8.4: Facial Login</div>
+    <div class="desc">Camera view on login page with authenticate button</div>
+  </div>
+
+  <div class="flow">Login Page → "Login with Face"
+    → Start Camera → Position Face → Authenticate
+    → Liveness Check → Extract Encoding
+    → Compare Against ALL Active FaceDescriptors
+    → Match Found? → auth_login(user) → Redirect to Home
+    → No Match? → Error Message</div>
+
+  <pre>@csrf_exempt
+def facial_login_verify(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', ...})
+    img = _decode_image(request)
+    if not _liveness_check(img):
+        return JsonResponse({'status': 'error',
+            'message': 'Liveness verification failed. Access denied.'})
+    live_encoding = _get_encoding_from_image(img)
+    descriptors = FaceDescriptor.objects.filter(is_active=True)
+    for desc in descriptors:
+        stored_encoding = pickle.loads(base64.b64decode(desc.embedding))
+        matches = face_recognition.compare_faces([stored_encoding], live_encoding)
+        if matches[0]:
+            auth_login(request, desc.user)
+            return JsonResponse({'status': 'ok', 'redirect': '/'})
+    return JsonResponse({'status': 'error',
+        'message': 'Face does not match any registered user.'})</pre>
+
+  <h3>8.6 Face Verification Flow</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 8.5: Face Verification</div>
+    <div class="desc">Verify identity page for authenticated users</div>
+  </div>
+
+  <div class="flow">Logged-in User → Verify Identity
+    → Start Camera → Position Face → Verify
+    → Liveness Check → Extract Encoding
+    → Compare Against Stored User Encoding
+    → Match? → session['face_verified'] = True
+    → No Match? → Error</div>
+
+  <h3>8.7 Security Measures</h3>
+  <ul>
+    <li><strong>No raw images stored:</strong> Only encrypted 128-d embeddings saved</li>
+    <li><strong>Spoof prevention:</strong> YOLO liveness detection blocks photos/videos</li>
+    <li><strong>Double-encoded storage:</strong> Pickle + Base64 for embedding serialization</li>
+    <li><strong>One-to-One mapping:</strong> Each user has exactly one FaceDescriptor</li>
+    <li><strong>Active/Inactive status:</strong> Ability to disable compromised enrollments</li>
+  </ul>
+
+  <pre>class FaceDescriptor(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    embedding = models.TextField(
+        help_text='Base64-encoded pickled face embedding')
+    is_active = models.BooleanField(default=True)
+    enrolled_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)</pre>
+
+  <h3>8.8 Anti-Spoofing Mechanisms</h3>
+  <p>The platform implements four layers of anti-spoofing protection:</p>
+  <table>
+    <tr><th>Layer</th><th>Mechanism</th><th>Description</th></tr>
+    <tr><td>1</td><td>Liveness Detection (YOLO)</td><td>Deep learning model trained on real vs. fake face samples; detects presentation attacks (photos, videos, masks); 0.8 confidence threshold</td></tr>
+    <tr><td>2</td><td>No Image Retention</td><td>Raw images immediately discarded after encoding; only 128-d vectors stored; impossible to reconstruct original face</td></tr>
+    <tr><td>3</td><td>Active Management</td><td><code>is_active</code> flag for disabling compromised enrollments; users can re-enroll; admin can disable suspicious entries</td></tr>
+    <tr><td>4</td><td>Session-Based Verification</td><td><code>face_verified</code> session key after successful biometric match; session expires after inactivity; server-side verification (cannot be tampered with)</td></tr>
+  </table>
+
+  <table>
+    <tr><th>Approach</th><th>Spoof Protection</th><th>Privacy</th><th>User Experience</th></tr>
+    <tr><td>Password Only</td><td>None</td><td>High</td><td>Low (memorization)</td></tr>
+    <tr><td>Face API (client-side)</td><td>Low</td><td>Medium</td><td>High</td></tr>
+    <tr><td><strong>Our Approach</strong></td><td><strong>High</strong></td><td><strong>High</strong></td><td><strong>High</strong></td></tr>
+    <tr><td>Fingerprint</td><td>High</td><td>Medium</td><td>Medium (hardware req.)</td></tr>
+  </table>
+</section>
+
+<!-- Section 9 -->
+<section class="section" id="sec9">
+  <h2>9. Trust Management Features</h2>
+
+  <h3>9.1 Trust Indicators Framework</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 9.1: Trust Indicators in Footer</div>
+    <div class="desc">Footer with all 8 policy page links</div>
+  </div>
+
+  <p>The platform implements eight comprehensive trust indicator pages:</p>
+  <table>
+    <tr><th>Policy Page</th><th>URL</th><th>Content</th></tr>
+    <tr><td>Privacy Policy</td><td><code>/privacy/</code></td><td>Data collection, usage, protection, user rights</td></tr>
+    <tr><td>Terms &amp; Conditions</td><td><code>/terms/</code></td><td>Platform rules, admin rights, liability</td></tr>
+    <tr><td>Security Policy</td><td><code>/security-policy/</code></td><td>RBAC, encryption, monitoring, incident response</td></tr>
+    <tr><td>Payment Policy</td><td><code>/payment-policy/</code></td><td>Accepted methods, security, refunds</td></tr>
+    <tr><td>Refund &amp; Return</td><td><code>/refund-policy/</code></td><td>Eligibility, process, non-refundable items</td></tr>
+    <tr><td>Shipping Policy</td><td><code>/shipping-policy/</code></td><td>Delivery time, fees, tracking</td></tr>
+    <tr><td>Vendor Policy</td><td><code>/vendor-policy/</code></td><td>Registration, responsibilities, payments</td></tr>
+    <tr><td>Admin Rights</td><td><code>/admin-rights/</code></td><td>Authority, system access, permissions</td></tr>
+  </table>
+
+  <h3>9.2 Trust Indicators in UI</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 9.2: Trust Badges</div>
+    <div class="desc">Stock status, role badges, face auth status indicators</div>
+  </div>
+
+  <p>Visual trust indicators throughout the platform include: stock status (green/yellow/red), payment status (green/yellow), order status (color-coded badges), user roles (purple admin, teal manager, orange vendor, gray customer), security padlock on Stripe button, and face auth status (green checkmark when enrolled).</p>
+
+  <h3>9.3 Authentication Notifications</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 9.3: Notification System</div>
+    <div class="desc">Bell icon notification dropdown with messages</div>
+  </div>
+
+  <p>Welcome messages on registration and login, face enrollment confirmation, successful biometric verification messages, and account-related notifications.</p>
+
+  <h3>9.4 Privacy Protection</h3>
+  <ul>
+    <li><strong>Data minimization:</strong> Only essential data collected during registration</li>
+    <li><strong>Address stored separately:</strong> From authentication data</li>
+    <li><strong>No raw biometric data:</strong> Only encrypted embeddings retained</li>
+    <li><strong>Policy consent:</strong> Required during registration</li>
+    <li><strong>Transparent data usage:</strong> Explained in privacy policy</li>
+  </ul>
+</section>
+
+<!-- Section 10 -->
+<section class="section" id="sec10">
+  <h2>10. Security Requirements Implementation</h2>
+
+  <h3>10.1 Data Security</h3>
+  <table>
+    <tr><th>Requirement</th><th>Implementation</th></tr>
+    <tr><td>Password Hashing</td><td>PBKDF2 with SHA-256 (Django default)</td></tr>
+    <tr><td>Data Encryption</td><td>Face embeddings: pickle + base64; Passwords: hashed</td></tr>
+    <tr><td>Secure API Communication</td><td>CSRF tokens on all POST requests</td></tr>
+    <tr><td>HTTPS Ready</td><td>SecurityMiddleware configured, SSL-ready</td></tr>
+  </table>
+
+  <h3>10.2 Authentication Security</h3>
+  <table>
+    <tr><th>Requirement</th><th>Implementation</th></tr>
+    <tr><td>Secure Login Validation</td><td>Django AuthenticationBackend</td></tr>
+    <tr><td>Facial Authentication</td><td>YOLO liveness + face_recognition</td></tr>
+    <tr><td>Session Timeout</td><td>14-day session age configurable</td></tr>
+    <tr><td>Multi-Factor Option</td><td>Password + Face (two independent factors)</td></tr>
+  </table>
+
+  <h3>10.3 Application Security</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 10.1: CSRF Protection</div>
+    <div class="desc">Hidden CSRF token in HTML form source</div>
+  </div>
+
+  <table>
+    <tr><th>Threat</th><th>Prevention</th></tr>
+    <tr><td>SQL Injection</td><td>Django ORM (parameterized queries)</td></tr>
+    <tr><td>XSS</td><td>Template auto-escaping, SecurityMiddleware</td></tr>
+    <tr><td>CSRF</td><td>CsrfViewMiddleware + {% csrf_token %}</td></tr>
+    <tr><td>Input Validation</td><td>Django forms with field validation</td></tr>
+    <tr><td>Clickjacking</td><td>X-Frame-Options: DENY</td></tr>
+  </table>
+
+  <h3>10.4 Payment Security</h3>
+  <p>Stripe Checkout provides PCI DSS compliant payment processing. The platform never stores credit card information — only Stripe session IDs are stored server-side.</p>
+
+  <h3>10.5 Role-Based Access Control</h3>
+
+  <p>The platform implements a four-tier role system with clear registration rules:</p>
+
+  <table>
+    <tr><th>Role</th><th>Self-Register</th><th>Created By</th><th>Approval Required</th></tr>
+    <tr><td>Admin</td><td style="color:var(--danger);text-align:center;">&#10007; No</td><td>System / Admin</td><td>Yes (strict)</td></tr>
+    <tr><td>Manager</td><td style="color:var(--danger);text-align:center;">&#10007; No</td><td>Admin</td><td>Yes</td></tr>
+    <tr><td>Vendor</td><td style="color:var(--danger);text-align:center;">&#10007; No</td><td>Admin / Manager</td><td>Yes (Admin final)</td></tr>
+    <tr><td>Customer</td><td style="color:var(--success);text-align:center;">&#10003; Yes</td><td>System / User / Admin</td><td>Optional (not required)</td></tr>
+  </table>
+
+  <p>Customer registration is open to anyone via the signup form. Admin, Manager, and Vendor roles are only created by existing admins/managers with appropriate oversight. Administrators can also manually set a new password for any user from the user management dashboard.</p>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 10.2: RBAC Enforcement</div>
+    <div class="desc">Admin dashboard restricted to admin role</div>
+  </div>
+
+  <pre>def role_required(*allowed_roles):
+    def decorator(view_func):
+        def _wrapped_view(request, *args, **kwargs):
+            if not request.user.is_authenticated:
+                return redirect('login')
+            profile = request.user.profile
+            if profile.role in allowed_roles:
+                return view_func(request, *args, **kwargs)
+            messages.error(request, 'You do not have permission.')
+            return redirect('product_list')
+        return _wrapped_view
+    return decorator</pre>
+
+  <h3>10.6 Activity Logging</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 10.3: Activity Log</div>
+    <div class="desc">Audit trail entries showing user actions</div>
+  </div>
+
+  <p>All significant actions are logged via the <code>ActivityLog</code> model tracking user, action type (create, update, delete, login, logout, view, payment, status_change), model name, object ID, description, IP address, and timestamp.</p>
+
+  <table>
+    <tr><th>Event Type</th><th>Data Captured</th></tr>
+    <tr><td>Login</td><td>User, IP, timestamp</td></tr>
+    <tr><td>Registration</td><td>User details</td></tr>
+    <tr><td>Order Create</td><td>Order ID, items, amount</td></tr>
+    <tr><td>Payment</td><td>Transaction ID, amount, method</td></tr>
+    <tr><td>Face Enrollment</td><td>User, timestamp</td></tr>
+  </table>
+
+  <h3>10.7 Input Validation and Sanitization</h3>
+  <p>Four validation layers: HTML5 client-side, Django form server-side, model database-level, and business logic view-level validation. CSRF tokens on all POST forms.</p>
+
+  <pre>&lt;!-- Every form includes CSRF token --&gt;
+&lt;form method="post"&gt;
+    {% csrf_token %}
+    ...
+&lt;/form&gt;</pre>
+</section>
+
+<!-- Section 11 -->
+<section class="section" id="sec11">
+  <h2>11. TAM/UTAUT Integration</h2>
+
+  <h3>11.1 Survey Implementation</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 11.1: TAM/UTAUT Survey</div>
+    <div class="desc">Likert scale survey with all technology acceptance constructs</div>
+  </div>
+
+  <p>A comprehensive technology acceptance survey measures user perceptions across TAM and UTAUT constructs on a 1-5 Likert scale.</p>
+
+  <h3>11.2 TAM Constructs</h3>
+  <table>
+    <tr><th>Construct</th><th>Question</th><th>Statement</th></tr>
+    <tr><td rowspan="3">Perceived Usefulness (PU)</td><td>PU1</td><td>Using MimicME Shop speeds up my shopping</td></tr>
+    <tr><td>PU2</td><td>The platform improves my shopping performance</td></tr>
+    <tr><td>PU3</td><td>I find MimicME Shop useful for shopping</td></tr>
+    <tr><td rowspan="3">Perceived Ease of Use (PEOU)</td><td>PEOU1</td><td>Learning to use the platform is easy</td></tr>
+    <tr><td>PEOU2</td><td>The platform is easy to use</td></tr>
+    <tr><td>PEOU3</td><td>My interaction is clear and understandable</td></tr>
+  </table>
+
+  <h3>11.3 UTAUT Constructs</h3>
+  <table>
+    <tr><th>Construct</th><th>Question</th><th>Statement</th></tr>
+    <tr><td>Performance Expectancy (PE)</td><td>PE1-PE2</td><td>Saves time, increases shopping productivity</td></tr>
+    <tr><td>Effort Expectancy (EE)</td><td>EE1-EE2</td><td>Requires minimal effort, easy to navigate</td></tr>
+    <tr><td>Social Influence (SI)</td><td>SI1-SI2</td><td>Others recommend, peers use the platform</td></tr>
+    <tr><td>Facilitating Conditions (FC)</td><td>FC1-FC2</td><td>Resources available, support available</td></tr>
+  </table>
+
+  <h3>11.4 Trust Constructs</h3>
+  <table>
+    <tr><th>Question</th><th>Statement</th></tr>
+    <tr><td>T1</td><td>I trust the system security</td></tr>
+    <tr><td>T2</td><td>I trust the payment system</td></tr>
+    <tr><td>T3</td><td>I trust the vendors on the platform</td></tr>
+  </table>
+
+  <h3>11.5 Behavioral Intention</h3>
+  <table>
+    <tr><th>Question</th><th>Statement</th></tr>
+    <tr><td>BI1</td><td>I intend to continue using the platform</td></tr>
+    <tr><td>BI2</td><td>I would recommend the platform to others</td></tr>
+  </table>
+
+  <h3>11.6 Survey Administration</h3>
+  <p>Available to authenticated users, one submission per user, scale of 1 (Strongly Disagree) to 5 (Strongly Agree), optional open-ended feedback, metrics stored in <code>TrustMetric</code> model.</p>
+
+  <h3>11.7 TAM Application in Platform Design</h3>
+  <p><strong>Perceived Usefulness:</strong> Fast checkout with pre-filled addresses, quick payment confirmation via Stripe, efficient product search with real-time filtering, instant facial authentication.</p>
+  <p><strong>Perceived Ease of Use:</strong> Clear navigation with role-based menus, simple registration process, one-click facial login, intuitive product browsing, mobile-responsive design.</p>
+  <p><strong>Performance Expectancy:</strong> Faster payment processing via Stripe, reliable transaction history, secure HTTPS experience.</p>
+  <p><strong>Effort Expectancy:</strong> Three-step checkout, simple app navigation, easy biometric authentication (camera → capture → done).</p>
+  <p><strong>Social Influence:</strong> Customer reviews and ratings, product testimonials, social trust through vendor verification.</p>
+  <p><strong>Facilitating Conditions:</strong> Mobile-responsive design, cross-platform compatibility, stable performance, comprehensive user guides and policy pages.</p>
+</section>
+
+<!-- Section 12 -->
+<section class="section" id="sec12">
+  <h2>12. Vendor Management System</h2>
+
+  <h3>12.1 Vendor Registration</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 12.1: Vendor Application Form</div>
+    <div class="desc">Vendor registration form with business details and documents</div>
+  </div>
+
+  <p>Vendor application collects: business information (name, type, email, phone), registration details (number, tax ID), address and location, uploaded documents (national ID, business license, tax certificate), banking information, logo, and business description.</p>
+
+  <h3>12.2 Vendor Dashboard</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 12.2: Vendor Dashboard</div>
+    <div class="desc">Statistics cards and recent orders for vendor</div>
+  </div>
+
+  <p>Total products count, total orders received, revenue and available balance, recent orders table, quick action buttons.</p>
+
+  <h3>12.3 Vendor Product Management</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 12.3: Vendor Products</div>
+    <div class="desc">Product list with add/edit/delete actions for vendor</div>
+  </div>
+
+  <p>Vendors can list products with stock levels, add new products (name, price, stock, description, image), edit existing products, delete with confirmation, and track inventory.</p>
+
+  <h3>12.4 Vendor Commission Model</h3>
+  <pre>class Vendor(models.Model):
+    # ...
+    commission_rate = models.DecimalField(
+        max_digits=5, decimal_places=2, default=10.00)
+    total_earnings = models.DecimalField(
+        max_digits=12, decimal_places=2, default=0)
+    available_balance = models.DecimalField(
+        max_digits=12, decimal_places=2, default=0)</pre>
+  <p>When a customer purchases a vendor's product: order total calculated → commission deducted (e.g., 10%) → net amount added to earnings → vendor can request withdrawal.</p>
+
+  <h3>12.5 Earnings and Withdrawals</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 12.4: Vendor Earnings</div>
+    <div class="desc">Earnings overview with withdrawal request form</div>
+  </div>
+
+  <p>Total earnings and available balance tracking, withdrawal request system, payout history, payment method selection (bank transfer, mobile money).</p>
+
+  <h3>12.6 Admin Approval</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 12.5: Vendor Approvals</div>
+    <div class="desc">Pending vendor applications with approve/reject actions</div>
+  </div>
+
+  <p>Pending applications review, document verification (ID, business license), approval/rejection workflow, automatic role assignment on approval.</p>
+</section>
+
+<!-- Section 13 -->
+<section class="section" id="sec13">
+  <h2>13. Admin Dashboard and Monitoring</h2>
+
+  <h3>13.1 Overview Dashboard</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 13.1: Admin Dashboard</div>
+    <div class="desc">Statistics cards, recent orders, low stock alerts</div>
+  </div>
+
+  <p>The admin dashboard provides statistics cards (total orders, revenue, users, products), recent 10 orders with status, low stock alerts (stock &lt; 5), vendor list with earnings, and quick actions (add product, view orders, manage vendors).</p>
+
+  <h3>13.2 Dynamic CRUD System</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 13.2: Model Manager</div>
+    <div class="desc">36+ models organized by app with search and CRUD actions</div>
+  </div>
+
+  <p>A comprehensive model management system provides sidebar navigation for 36+ models organized by app, search filtering across all fields, dynamic add/edit/delete forms for any model, and Bootstrap Icons for each model type.</p>
+
+  <h3>13.3 User Management</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 13.3: User Management</div>
+    <div class="desc">Users table with role badges and active status</div>
+  </div>
+
+  <p>List all users with role badges, active/inactive status indicators, direct links to Django admin.</p>
+
+  <h3>13.4 Employee Management</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 13.4: Employee Management</div>
+    <div class="desc">Employee profiles with department, position, salary</div>
+  </div>
+
+  <p>Employee profiles with department and position, salary information, attendance and payroll tracking.</p>
+</section>
+
+<!-- Section 14 -->
+<section class="section" id="sec14">
+  <h2>14. Notification and Support Systems</h2>
+
+  <h3>14.1 Notification System</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 14.1: Notification Dropdown</div>
+    <div class="desc">Bell icon with unread badge and dropdown menu</div>
+  </div>
+
+  <p>Notification types: order, payment, delivery, promotion, system. In-app delivery with dropdown menu, unread count badge on navbar bell icon, color-coded icons per type, bulk mark-as-read action.</p>
+
+  <h3>14.2 Support Ticket System</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 14.2: Support Ticket</div>
+    <div class="desc">Ticket list with priority levels and status</div>
+  </div>
+
+  <p>Ticket creation with subject and message, priority levels (low, medium, high, urgent), status tracking (open, in progress, resolved, closed), admin assignment and reply system.</p>
+
+  <h3>14.3 Activity Log</h3>
+  <p>All system activities logged with user identification, action type, timestamp, IP address, and object reference for complete audit trail.</p>
+</section>
+
+<!-- Section 15 -->
+<section class="section" id="sec15">
+  <h2>15. Content Management System</h2>
+
+  <h3>15.1 Site Settings</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 15.1: Site Settings Admin</div>
+    <div class="desc">Site configuration form with logo, contact, currency settings</div>
+  </div>
+
+  <p>Singleton configuration managing site name, tagline, logo, favicon, contact info (email, phone, address), currency and tax configuration, and free shipping threshold.</p>
+
+  <h3>15.2 Banner Management</h3>
+  <p>Homepage promotional banners with images, link URLs, ordering, and active/inactive status control.</p>
+
+  <h3>15.3 FAQs</h3>
+  <p>Frequently asked questions management with ordered display and active/inactive control.</p>
+
+  <h3>15.4 Policy Pages</h3>
+  <p>Eight comprehensive policy pages serving as trust indicators: Privacy, Terms, Security, Payment, Refund, Shipping, Vendor, and Admin Rights.</p>
+</section>
+
+<!-- Section 16 -->
+<section class="section" id="sec16">
+  <h2>16. User Experience (UX) Design</h2>
+
+  <h3>16.1 Visual Design</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 16.1: Homepage</div>
+    <div class="desc">Full homepage with product grid, navbar, and banners</div>
+  </div>
+
+  <p><strong>Color Scheme:</strong> Purple gradient theme (#6c5ce7 primary) with glassmorphism cards, gradient buttons, shadow effects, and fade-in-up animations.</p>
+  <p><strong>Typography:</strong> Inter font family for clean, modern readability.</p>
+
+  <h3>16.2 Responsive Design</h3>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128196;</span>
+    <div class="label">Screenshot 16.2: Mobile Responsive View</div>
+    <div class="desc">Mobile view showing hamburger menu and responsive grid</div>
+  </div>
+
+  <p>Bootstrap 5 responsive grid, mobile-optimized navigation with hamburger menu, touch-friendly buttons, adaptable product grid (4 columns → 2 → 1).</p>
+
+  <h3>16.3 Navigation</h3>
+  <p>Fixed top navbar with brand, product links, cart, and user menu. Role-based links for different user types. Admin dashboard sidebar with model navigator.</p>
+
+  <h3>16.4 Feedback Mechanisms</h3>
+  <p>Toast messages via Django messages framework (success, error, warning, info), inline form validation errors, button loading states, animated progress indicators.</p>
+
+  <h3>16.5 Accessibility</h3>
+  <p>Semantic HTML (headings, landmarks, ARIA labels), high color contrast, keyboard navigation, visible focus states, screen reader support (alt text, descriptive links), relative units for font scaling, clear error messages with field-level feedback.</p>
+</section>
+
+<!-- Section 17 -->
+<section class="section" id="sec17">
+  <h2>17. Testing and Quality Assurance</h2>
+
+  <h3>17.1 Testing Approach</h3>
+  <p>Unit tests with Django TestCase for models and views, integration tests for complete flows, security testing for CSRF/XSS/SQL injection prevention, cross-browser testing (Chrome, Firefox, Edge, Safari), camera/WebRTC testing with multiple lighting conditions, and liveness model validation (photos, videos, live faces).</p>
+
+  <h3>17.2 Test Data</h3>
+  <pre># Seed test data
+python manage.py seed_users
+python manage.py seed_products
+
+# Default admin credentials
+# Username: francispancras
+# Password: Francis@2026!Secure</pre>
+
+  <h3>17.3 Security Testing</h3>
+  <p>CSRF token validation on all POST requests, XSS prevention via template auto-escaping, SQL injection prevention via Django ORM parameterized queries, role-based access control testing, and biometric spoof testing against photos/videos.</p>
+</section>
+
+<!-- Section 18 -->
+<section class="section" id="sec18">
+  <h2>18. Deployment and Operations</h2>
+
+  <h3>18.1 Requirements</h3>
+  <pre>Django>=5.0
+stripe>=8.0
+Pillow>=10.0
+opencv-python>=4.9
+face_recognition>=1.3
+numpy>=1.26
+ultralytics>=8.0
+cvzone>=1.6</pre>
+
+  <h3>18.2 Running the Application</h3>
+  <pre># Install dependencies
+pip install -r requirements.txt
+
+# Run migrations
+python manage.py migrate
+
+# Seed sample data
+python manage.py seed_users
+python manage.py seed_products
+
+# Start server (HTTP)
+python manage.py runserver
+
+# For webcam access (HTTPS required):
+python manage.py runsslserver</pre>
+
+  <h3>18.3 Production Considerations</h3>
+  <p>Switch to PostgreSQL, configure HTTPS with valid SSL certificate, set <code>DEBUG = False</code>, configure <code>ALLOWED_HOSTS</code>, set proper <code>SECRET_KEY</code> via environment variables, configure Stripe live keys, enable <code>CSRF_TRUSTED_ORIGINS</code>.</p>
+</section>
+
+<!-- Section 19 -->
+<section class="section" id="sec19">
+  <h2>19. Challenges and Solutions</h2>
+  <table>
+    <tr><th>Challenge</th><th>Solution</th></tr>
+    <tr><td>Webcam HTTPS Requirement</td><td>Integrated django-sslserver for development</td></tr>
+    <tr><td>Liveness Detection Accuracy</td><td>Custom YOLO model with 0.8 confidence threshold</td></tr>
+    <tr><td>Face Recognition Performance</td><td>Downsampled images for faster processing</td></tr>
+    <tr><td>Secure Biometric Storage</td><td>No raw images saved; only encrypted 128-d embeddings</td></tr>
+    <tr><td>Payment Security</td><td>Stripe Checkout (PCI DSS compliant, no card data stored)</td></tr>
+    <tr><td>Role-Based Access</td><td>Custom decorator with 4-role system</td></tr>
+    <tr><td>Password Reset Security</td><td>Django's token-based system with time-limited tokens</td></tr>
+  </table>
+</section>
+
+<!-- Section 20 -->
+<section class="section" id="sec20">
+  <h2>20. Conclusion and Recommendations</h2>
+
+  <h3>20.1 Achievement Summary</h3>
+  <p>The MimicME Shop platform successfully addresses SmartTrade Africa Ltd's trust and security challenges through:</p>
+  <ol>
+    <li><strong>Multi-Factor Authentication:</strong> Password + facial biometric with liveness detection</li>
+    <li><strong>Secure Payments:</strong> Stripe API integration with PCI DSS compliance</li>
+    <li><strong>Trust Framework:</strong> Eight comprehensive policy pages and visual trust indicators</li>
+    <li><strong>Role-Based Access:</strong> Four-tier access control system</li>
+    <li><strong>Audit Trail:</strong> Complete activity logging for accountability</li>
+    <li><strong>TAM/UTAUT Integration:</strong> Built-in survey system for measuring technology acceptance</li>
+    <li><strong>Spoof-Proof Biometrics:</strong> YOLO-based liveness detection prevents presentation attacks</li>
+  </ol>
+
+  <h3>20.2 TAM/UTAUT Evaluation</h3>
+  <p>The platform design incorporates TAM and UTAUT principles at every level — from perceived usefulness (fast checkout, efficient search, instant facial login) to facilitating conditions (cross-platform support, comprehensive help resources).</p>
+
+  <h3>20.3 Recommendations</h3>
+  <ol>
+    <li><strong>Mobile Application:</strong> Native iOS/Android apps with fingerprint biometric support</li>
+    <li><strong>Blockchain Integration:</strong> Transparent transaction logging</li>
+    <li><strong>AI-Powered Fraud Detection:</strong> Real-time transaction monitoring</li>
+    <li><strong>Advanced Liveness:</strong> Eye-blinking and head-turning challenge integration</li>
+    <li><strong>WebAuthn Support:</strong> Browser-based biometric authentication</li>
+    <li><strong>Two-Factor Authentication:</strong> SMS/email OTP combined with biometrics</li>
+    <li><strong>Performance Optimization:</strong> Database indexing and query optimization</li>
+    <li><strong>Progressive Web App:</strong> Offline capabilities and native-like experience</li>
+  </ol>
+</section>
+
+<!-- Section 21 -->
+<section class="section" id="sec21">
+  <h2>21. References</h2>
+  <ol>
+    <li>Davis, F. D. (1989). Perceived usefulness, perceived ease of use, and user acceptance of information technology. <em>MIS Quarterly</em>, 13(3), 319-340.</li>
+    <li>Venkatesh, V., Morris, M. G., Davis, G. B., &amp; Davis, F. D. (2003). User acceptance of information technology: Toward a unified view. <em>MIS Quarterly</em>, 27(3), 425-478.</li>
+    <li>Django Software Foundation. (2026). Django Documentation (5.2). https://docs.djangoproject.com/en/5.2/</li>
+    <li>Stripe Inc. (2026). Stripe API Documentation. https://stripe.com/docs/api</li>
+    <li>Geitgey, A. (2026). face_recognition: The world's simplest facial recognition API. https://github.com/ageitgey/face_recognition</li>
+    <li>Ultralytics. (2026). YOLOv8 Documentation. https://docs.ultralytics.com</li>
+    <li>OpenCV Team. (2026). OpenCV Documentation. https://docs.opencv.org</li>
+    <li>TCG (Trusted Computing Group). (2024). TPM 2.0 Library Specification.</li>
+    <li>Mayer, R. C., Davis, J. H., &amp; Schoorman, F. D. (1995). An integrative model of organizational trust. <em>Academy of Management Review</em>, 20(3), 709-734.</li>
+    <li>Pavlou, P. A. (2003). Consumer acceptance of electronic commerce: Integrating trust and risk with the technology acceptance model. <em>International Journal of Electronic Commerce</em>, 7(3), 101-134.</li>
+  </ol>
+</section>
+
+<!-- Appendix A -->
+<section class="section" id="appA">
+  <h2>Appendix A: Complete Database Schema</h2>
+
+  <div class="screenshot-placeholder">
+    <span class="icon">&#128202;</span>
+    <div class="label">Screenshot A.1: Entity-Relationship Diagram</div>
+    <div class="desc">Complete ER diagram showing all tables and relationships</div>
+  </div>
+
+  <h3>accounts App</h3>
+  <pre>CREATE TABLE accounts_userprofile (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE REFERENCES auth_user(id),
+    role VARCHAR(20) NOT NULL DEFAULT 'customer'
+);
+
+CREATE TABLE accounts_address (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES auth_user(id),
+    address_type VARCHAR(20) NOT NULL,
+    first_name VARCHAR(100), last_name VARCHAR(100),
+    phone VARCHAR(20), address_line1 VARCHAR(250),
+    address_line2 VARCHAR(250), city VARCHAR(100),
+    state VARCHAR(100), postal_code VARCHAR(20),
+    country VARCHAR(100) DEFAULT 'Kenya',
+    is_default BOOLEAN DEFAULT FALSE, created DATETIME
+);
+
+CREATE TABLE accounts_employeeprofile (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE REFERENCES auth_user(id),
+    employee_id VARCHAR(50) UNIQUE, department VARCHAR(100),
+    position VARCHAR(100), phone VARCHAR(20),
+    salary DECIMAL(10,2) DEFAULT 0,
+    hire_date DATE, is_active BOOLEAN DEFAULT TRUE
+);</pre>
+
+  <h3>products App</h3>
+  <pre>CREATE TABLE products_category (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255), slug VARCHAR(255) UNIQUE
+);
+
+CREATE TABLE products_brand (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255), slug VARCHAR(255) UNIQUE,
+    logo VARCHAR(100), description LONGTEXT
+);
+
+CREATE TABLE products_product (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    category_id BIGINT REFERENCES products_category(id),
+    brand_id BIGINT REFERENCES products_brand(id),
+    vendor_id BIGINT REFERENCES vendor_vendor(id),
+    name VARCHAR(255), slug VARCHAR(255) UNIQUE,
+    description LONGTEXT, price DECIMAL(10,2),
+    image VARCHAR(100), stock INT, available BOOLEAN,
+    created DATETIME, updated DATETIME
+);</pre>
+
+  <h3>biometric App</h3>
+  <pre>CREATE TABLE biometric_facedescriptor (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE REFERENCES auth_user(id),
+    embedding LONGTEXT NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    enrolled_at DATETIME, updated_at DATETIME
+);
+
+CREATE TABLE biometric_biometricsession (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES auth_user(id),
+    session_token VARCHAR(255),
+    is_verified BOOLEAN DEFAULT FALSE,
+    created_at DATETIME, expires_at DATETIME
+);</pre>
+
+  <h3>Key Indices and Constraints</h3>
+  <table>
+    <tr><th>Table</th><th>Constraint</th><th>Columns</th></tr>
+    <tr><td>products_product</td><td>UNIQUE</td><td>slug</td></tr>
+    <tr><td>biometric_facedescriptor</td><td>UNIQUE</td><td>user_id</td></tr>
+    <tr><td>accounts_userprofile</td><td>UNIQUE</td><td>user_id</td></tr>
+    <tr><td>vendor_vendor</td><td>UNIQUE</td><td>user_id</td></tr>
+    <tr><td>surveys_tamutautsurvey</td><td>UNIQUE</td><td>user_id</td></tr>
+    <tr><td>products_productreview</td><td>UNIQUE</td><td>(product_id, user_id)</td></tr>
+  </table>
+</section>
+
+<!-- Appendix B -->
+<section class="section" id="appB">
+  <h2>Appendix B: Complete URL Routes</h2>
+
+  <h3>Root Routes (<code>ecommerce/urls.py</code>)</h3>
+  <table>
+    <tr><th>Path</th><th>Target</th></tr>
+    <tr><td><code>/admin/</code></td><td>Django Admin</td></tr>
+    <tr><td><code>/cart/</code></td><td>include(cart.urls)</td></tr>
+    <tr><td><code>/checkout/</code></td><td>include(checkout.urls)</td></tr>
+    <tr><td><code>/accounts/</code></td><td>include(accounts.urls)</td></tr>
+    <tr><td><code>/orders/</code></td><td>include(orders.urls)</td></tr>
+    <tr><td><code>/vendor/</code></td><td>include(vendor.urls)</td></tr>
+    <tr><td><code>/dashboard/</code></td><td>include(dashboard.urls)</td></tr>
+    <tr><td><code>/biometric/</code></td><td>include(biometric.urls)</td></tr>
+    <tr><td><code>/survey/</code></td><td>include(surveys.urls)</td></tr>
+    <tr><td><code>/privacy/</code></td><td>cms.views.policy_view</td></tr>
+    <tr><td><code>/terms/</code></td><td>cms.views.policy_view</td></tr>
+    <tr><td><code>/security-policy/</code></td><td>cms.views.policy_view</td></tr>
+    <tr><td><code>/payment-policy/</code></td><td>cms.views.policy_view</td></tr>
+    <tr><td><code>/refund-policy/</code></td><td>cms.views.policy_view</td></tr>
+    <tr><td><code>/shipping-policy/</code></td><td>cms.views.policy_view</td></tr>
+    <tr><td><code>/vendor-policy/</code></td><td>cms.views.policy_view</td></tr>
+    <tr><td><code>/admin-rights/</code></td><td>cms.views.policy_view</td></tr>
+    <tr><td><code>/</code> (root)</td><td>include(products.urls)</td></tr>
+  </table>
+
+  <h3>Accounts Routes (<code>accounts/urls.py</code>)</h3>
+  <table>
+    <tr><th>Path</th><th>View</th><th>Name</th></tr>
+    <tr><td><code>/signup/</code></td><td>accounts.signup</td><td><code>signup</code></td></tr>
+    <tr><td><code>/login/</code></td><td>LoginView</td><td><code>login</code></td></tr>
+    <tr><td><code>/logout/</code></td><td>custom_logout</td><td><code>logout</code></td></tr>
+    <tr><td><code>/profile/</code></td><td>profile</td><td><code>profile</code></td></tr>
+    <tr><td><code>/password-reset/</code></td><td>PasswordResetView</td><td><code>password_reset</code></td></tr>
+    <tr><td><code>/password-reset/done/</code></td><td>PasswordResetDoneView</td><td><code>password_reset_done</code></td></tr>
+    <tr><td><code>/password-reset/&lt;uidb64&gt;/&lt;token&gt;/</code></td><td>PasswordResetConfirmView</td><td><code>password_reset_confirm</code></td></tr>
+    <tr><td><code>/password-reset/complete/</code></td><td>PasswordResetCompleteView</td><td><code>password_reset_complete</code></td></tr>
+  </table>
+
+  <h3>Biometric Routes (<code>biometric/urls.py</code>)</h3>
+  <table>
+    <tr><th>Path</th><th>View</th><th>Name</th></tr>
+    <tr><td><code>/enrollment/</code></td><td>enrollment</td><td><code>biometric_enrollment</code></td></tr>
+    <tr><td><code>/save-descriptor/</code></td><td>save_face_descriptor</td><td><code>biometric_save</code></td></tr>
+    <tr><td><code>/verify/</code></td><td>verify_face</td><td><code>biometric_verify</code></td></tr>
+    <tr><td><code>/verify-descriptor/</code></td><td>verify_face_descriptor</td><td><code>biometric_verify_descriptor</code></td></tr>
+    <tr><td><code>/facial-login/</code></td><td>facial_login</td><td><code>biometric_facial_login</code></td></tr>
+    <tr><td><code>/facial-login-verify/</code></td><td>facial_login_verify</td><td><code>biometric_facial_login_verify</code></td></tr>
+  </table>
+
+  <h3>Dashboard Routes (<code>dashboard/urls.py</code>)</h3>
+  <table>
+    <tr><th>Path</th><th>View</th></tr>
+    <tr><td><code>/</code></td><td>admin_dashboard</td></tr>
+    <tr><td><code>/vendors/</code></td><td>vendor_approvals</td></tr>
+    <tr><td><code>/vendors/approve/&lt;int:vendor_id&gt;/</code></td><td>vendor_approve</td></tr>
+    <tr><td><code>/vendors/reject/&lt;int:vendor_id&gt;/</code></td><td>vendor_reject</td></tr>
+    <tr><td><code>/users/</code></td><td>manage_users</td></tr>
+    <tr><td><code>/employees/</code></td><td>manage_employees</td></tr>
+    <tr><td><code>/admin/&lt;app_label&gt;/&lt;model_name&gt;/</code></td><td>model_list</td></tr>
+    <tr><td><code>/admin/&lt;app_label&gt;/&lt;model_name&gt;/add/</code></td><td>model_add</td></tr>
+    <tr><td><code>/admin/&lt;app_label&gt;/&lt;model_name&gt;/&lt;pk&gt;/change/</code></td><td>model_edit</td></tr>
+    <tr><td><code>/admin/&lt;app_label&gt;/&lt;model_name&gt;/&lt;pk&gt;/delete/</code></td><td>model_delete</td></tr>
+  </table>
+</section>
+
+<!-- Appendix C -->
+<section class="section" id="appC">
+  <h2>Appendix C: Screenshots Index</h2>
+  <table>
+    <tr><th>Screenshot</th><th>Description</th><th>Section</th></tr>
+    <tr><td>3.1</td><td>System Architecture Diagram</td><td>3.2</td></tr>
+    <tr><td>4.1</td><td>Sign Up Page</td><td>4.1</td></tr>
+    <tr><td>4.2</td><td>Login Page</td><td>4.2</td></tr>
+    <tr><td>4.3</td><td>Password Reset</td><td>4.3</td></tr>
+    <tr><td>5.1</td><td>Product Listing</td><td>5.1</td></tr>
+    <tr><td>5.2</td><td>Product Detail</td><td>5.2</td></tr>
+    <tr><td>5.3</td><td>Shopping Cart</td><td>5.3</td></tr>
+    <tr><td>5.4</td><td>Wishlist</td><td>5.4</td></tr>
+    <tr><td>6.1</td><td>Stripe Checkout</td><td>6.1</td></tr>
+    <tr><td>6.2</td><td>Transaction Record</td><td>6.3</td></tr>
+    <tr><td>8.1</td><td>Face Enrollment</td><td>8.1</td></tr>
+    <tr><td>8.2</td><td>Liveness Detection</td><td>8.2</td></tr>
+    <tr><td>8.3</td><td>Enrollment Success</td><td>8.4</td></tr>
+    <tr><td>8.4</td><td>Facial Login</td><td>8.5</td></tr>
+    <tr><td>8.5</td><td>Face Verification</td><td>8.6</td></tr>
+    <tr><td>9.1</td><td>Trust Indicators Footer</td><td>9.1</td></tr>
+    <tr><td>9.2</td><td>Trust Badges</td><td>9.2</td></tr>
+    <tr><td>9.3</td><td>Notification</td><td>9.3</td></tr>
+    <tr><td>10.1</td><td>CSRF Protection</td><td>10.3</td></tr>
+    <tr><td>10.2</td><td>RBAC Enforcement</td><td>10.5</td></tr>
+    <tr><td>10.3</td><td>Activity Log</td><td>10.6</td></tr>
+    <tr><td>11.1</td><td>TAM/UTAUT Survey</td><td>11.1</td></tr>
+    <tr><td>12.1</td><td>Vendor Application</td><td>12.1</td></tr>
+    <tr><td>12.2</td><td>Vendor Dashboard</td><td>12.2</td></tr>
+    <tr><td>12.3</td><td>Vendor Products</td><td>12.3</td></tr>
+    <tr><td>12.4</td><td>Vendor Earnings</td><td>12.4</td></tr>
+    <tr><td>12.5</td><td>Vendor Approvals</td><td>12.5</td></tr>
+    <tr><td>13.1</td><td>Admin Dashboard</td><td>13.1</td></tr>
+    <tr><td>13.2</td><td>Model Manager</td><td>13.2</td></tr>
+    <tr><td>13.3</td><td>User Management</td><td>13.3</td></tr>
+    <tr><td>13.4</td><td>Employee Management</td><td>13.4</td></tr>
+    <tr><td>14.1</td><td>Notification Dropdown</td><td>14.1</td></tr>
+    <tr><td>14.2</td><td>Support Ticket</td><td>14.2</td></tr>
+    <tr><td>15.1</td><td>Site Settings Admin</td><td>15.1</td></tr>
+    <tr><td>16.1</td><td>Homepage</td><td>16.1</td></tr>
+    <tr><td>16.2</td><td>Mobile View</td><td>16.2</td></tr>
+    <tr><td>A.1</td><td>ER Diagram</td><td>Appendix A</td></tr>
+  </table>
+</section>
+
+<!-- Footer -->
+<div style="text-align:center;padding:40px 0 60px;color:var(--text-light);font-size:13px;">
+  <p style="margin-bottom:4px;"><strong>MimicME Shop</strong> — Secure E-Commerce Platform</p>
+  <p style="margin-bottom:4px;">Course 428: Trust Management in E-Commerce — Group Project</p>
+  <p>Client: SmartTrade Africa Ltd &bull; June 2026</p>
+  <hr style="max-width:200px;margin:20px auto;border-color:var(--border);">
+  <p style="font-size:11px;opacity:0.6;">End of Report</p>
+</div>
+
+</div><!-- /container -->
+
+</body>
+</html>

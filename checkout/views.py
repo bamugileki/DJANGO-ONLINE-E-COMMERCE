@@ -32,23 +32,30 @@ def checkout_view(request):
             )
 
         stripe.api_key = settings.STRIPE_SECRET_KEY
-        session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[{
-                'price_data': {
-                    'currency': 'tzs',
-                    'product_data': {'name': item['product'].name},
-                    'unit_amount': int(item['price'] * 100),
-                },
-                'quantity': item['quantity'],
-            } for item in cart],
-            mode='payment',
-            success_url=request.build_absolute_uri(reverse('checkout_success', args=[order.id])),
-            cancel_url=request.build_absolute_uri(reverse('checkout_cancel')),
-        )
-        order.stripe_id = session.id
-        order.save()
-        return redirect(session.url, code=303)
+        try:
+            session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=[{
+                    'price_data': {
+                        'currency': 'tzs',
+                        'product_data': {'name': item['product'].name},
+                        'unit_amount': int(item['price'] * 100),
+                    },
+                    'quantity': item['quantity'],
+                } for item in cart],
+                mode='payment',
+                success_url=request.build_absolute_uri(reverse('checkout_success', args=[order.id])),
+                cancel_url=request.build_absolute_uri(reverse('checkout_cancel')),
+            )
+            order.stripe_id = session.id
+            order.save()
+            return redirect(session.url, code=303)
+        except stripe.error.AuthenticationError:
+            order.delete()
+            return render(request, 'checkout/checkout.html', {
+                'cart': cart,
+                'stripe_error': 'Stripe is not configured. Add your Stripe secret key to settings.py.',
+            })
 
     return render(request, 'checkout/checkout.html', {'cart': cart})
 

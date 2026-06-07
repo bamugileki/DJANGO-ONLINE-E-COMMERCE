@@ -7,3 +7,6 @@ db.sqlite3
 .env
 venv/
 .venv/
+
+# YOLO model (download separately)
+biometric/Liveness_detection_models/best.pt

@@ -1,149 +1,167 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Face Verification - {{ site_settings.site_name }}{% endblock %}
+{% block title %}Face Verification{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card p-5 fade-in-up">
-            <h1 class="fw-bold mb-2">Face Verification</h1>
-            <p class="text-muted mb-4">Verify your identity using facial recognition to proceed.</p>
+<div class="row justify-content-center fade-in-up">
+    <div class="col-md-8 col-lg-6">
+        <div class="card-form text-center">
+            <div class="profile-avatar" style="width:70px;height:70px;font-size:2rem;margin:0 auto 1rem;">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <h4 class="fw-bold">Face Verification</h4>
+            <p class="text-muted mb-4">Verify your identity using facial recognition with liveness detection.</p>
 
-            <form id="verify-form" method="post" action="{% url 'biometric_verify_descriptor' %}">
-                {% csrf_token %}
-                <input type="hidden" name="descriptor" id="descriptor-input">
-                <input type="hidden" name="next" value="{{ next_url }}">
-            </form>
-
-            <div class="text-center mb-4">
-                <div class="position-relative d-inline-block">
-                    <video id="video" width="480" height="360" autoplay muted class="rounded-3 border"></video>
-                    <canvas id="overlay" class="position-absolute top-0 start-0" width="480" height="360"></canvas>
+            <div class="position-relative rounded-4 overflow-hidden border border-2 border-primary mb-4 mx-auto" style="max-width:480px;aspect-ratio:4/3;background:#1a1a2e;">
+                <div id="placeholderDiv" class="d-flex align-items-center justify-content-center h-100 text-white-50">
+                    <div>
+                        <i class="bi bi-camera" style="font-size:3rem;display:block;margin-bottom:0.5rem;"></i>
+                        <span>Camera preview appears here</span>
+                    </div>
                 </div>
-                <div id="status" class="mt-3 text-muted">Loading camera...</div>
+                <video id="video" autoplay playsinline class="w-100 h-100 object-fit-cover d-none"></video>
+                <canvas id="canvas" class="d-none"></canvas>
+                <div id="scanOverlay" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(59,130,246,0.1);pointer-events:none;">
+                    <div class="scan-line"></div>
+                </div>
             </div>
 
-            <div class="text-center">
-                <button id="verify-btn" class="btn btn-gradient-success btn-lg btn-sparkle" disabled>
-                    <i class="bi bi-shield-check"></i> Verify Identity
-                </button>
-                <a href="{{ next_url }}" class="btn btn-outline-secondary btn-lg">
-                    <i class="bi bi-x-circle"></i> Skip (Password Only)
-                </a>
+            <button type="button" id="verifyBtn" class="btn btn-gradient btn-lg w-100 btn-sparkle mb-3">
+                <i class="bi bi-camera"></i> <span id="verifyBtnText">Start Camera</span>
+            </button>
+
+            <div class="p-3 bg-light rounded-3 mb-3">
+                <div class="d-flex align-items-center gap-2 justify-content-center">
+                    <div id="statusIndicator" class="rounded-circle" style="width:12px;height:12px;background:#adb5bd;"></div>
+                    <span id="resultText" class="text-muted small fw-semibold">System Ready</span>
+                </div>
             </div>
 
-            <div id="result" class="mt-4 d-none"></div>
+            <a href="{{ next_url }}" class="text-decoration-none fw-bold" style="color:var(--primary);">
+                <i class="bi bi-arrow-left"></i> Skip & Go Back
+            </a>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
-<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<style>
+    .scan-line {
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        background: #3b82f6;
+        box-shadow: 0 0 15px rgba(59,130,246,0.8);
+        animation: scan 2s ease-in-out infinite;
+        top: 10%;
+    }
+    @keyframes scan {
+        0% { top: 10%; opacity: 0; }
+        50% { opacity: 1; }
+        100% { top: 90%; opacity: 0; }
+    }
+</style>
+
 <script>
-document.addEventListener('DOMContentLoaded', async function() {
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('overlay');
-    const status = document.getElementById('status');
-    const verifyBtn = document.getElementById('verify-btn');
-    const resultDiv = document.getElementById('result');
-    const descriptorInput = document.getElementById('descriptor-input');
-    let currentDescriptor = null;
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const verifyBtn = document.getElementById("verifyBtn");
+    const verifyBtnText = document.getElementById("verifyBtnText");
+    const resultText = document.getElementById("resultText");
+    const statusIndicator = document.getElementById("statusIndicator");
+    const scanOverlay = document.getElementById("scanOverlay");
+    const placeholderDiv = document.getElementById("placeholderDiv");
 
-    async function loadModels() {
-        status.textContent = 'Loading face detection models...';
-        try {
-            await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
-            await faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
-            await faceapi.nets.faceRecognitionNet.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
-            status.textContent = 'Models loaded. Starting camera...';
-            return true;
-        } catch (e) {
-            status.textContent = 'Failed to load face models: ' + e.message;
-            return false;
-        }
-    }
+    let globalStream = null;
+    const csrfToken = "{{ csrf_token }}";
 
-    async function startCamera() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
-            video.srcObject = stream;
-            status.textContent = 'Camera active. Position your face to verify.';
-            return true;
-        } catch (e) {
-            status.textContent = 'Camera access denied. Please allow camera permissions.';
-            return false;
-        }
-    }
-
-    async function detectFace() {
-        const displaySize = { width: video.width, height: video.height };
-        faceapi.matchDimensions(canvas, displaySize);
-
-        setInterval(async () => {
-            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-                .withFaceLandmarks()
-                .withFaceDescriptors();
-            const resized = faceapi.resizeResults(detections, displaySize);
-            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-            faceapi.draw.drawDetections(canvas, resized);
-            if (detections.length > 0) {
-                currentDescriptor = detections[0].descriptor;
-                let blink = false;
-                if (detections[0].landmarks) {
-                    const leftEye = detections[0].landmarks.getLeftEye();
-                    const rightEye = detections[0].landmarks.getRightEye();
-                    const leftEAR = (Math.abs(leftEye[1].y - leftEye[5].y) + Math.abs(leftEye[2].y - leftEye[4].y)) / (2 * Math.abs(leftEye[0].x - leftEye[3].x));
-                    const rightEAR = (Math.abs(rightEye[1].y - rightEye[5].y) + Math.abs(rightEye[2].y - rightEye[4].y)) / (2 * Math.abs(rightEye[0].x - rightEye[3].x));
-                    blink = (leftEAR + rightEAR) / 2 < 0.2;
-                }
-                status.textContent = blink ? 'Blink detected - liveness confirmed!' : 'Face detected. Click Verify.';
-                verifyBtn.disabled = false;
-            } else {
-                status.textContent = 'No face detected.';
-                verifyBtn.disabled = true;
-            }
-        }, 500);
-    }
-
-    const modelsLoaded = await loadModels();
-    if (modelsLoaded) {
-        await startCamera();
-        detectFace();
-    }
-
-    verifyBtn.addEventListener('click', async function() {
-        if (!currentDescriptor) return;
-        verifyBtn.disabled = true;
-        status.textContent = 'Verifying...';
-        descriptorInput.value = JSON.stringify(Array.from(currentDescriptor));
-
-        try {
-            const response = await fetch('{% url "biometric_verify_descriptor" %}', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-                body: JSON.stringify({ descriptor: descriptorInput.value })
+    function startCamera() {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+            .then(stream => {
+                globalStream = stream;
+                video.srcObject = stream;
+                video.classList.remove('d-none');
+                placeholderDiv.classList.add('d-none');
+                resultText.textContent = "Camera Online - Click to Verify";
+                resultText.className = "fw-semibold small";
+                resultText.style.color = "#333";
+                statusIndicator.style.background = "#3b82f6";
+                statusIndicator.style.boxShadow = "0 0 10px rgba(59,130,246,1)";
+            })
+            .catch(err => {
+                console.error("Camera Error:", err);
+                resultText.textContent = "Camera access denied";
+                resultText.className = "fw-semibold small text-danger";
+                statusIndicator.style.background = "#dc3545";
             });
-            const data = await response.json();
-            if (data.status === 'ok') {
-                resultDiv.className = 'mt-4 alert alert-success';
-                resultDiv.innerHTML = '<i class="bi bi-shield-check"></i> <strong>Verification successful!</strong> Redirecting...';
-                resultDiv.classList.remove('d-none');
-                setTimeout(() => { window.location.href = '{{ next_url }}'; }, 1000);
-            } else {
-                resultDiv.className = 'mt-4 alert alert-danger';
-                resultDiv.innerHTML = '<i class="bi bi-exclamation-triangle"></i> <strong>Verification failed:</strong> ' + data.message + ' (similarity: ' + (data.similarity * 100).toFixed(1) + '%)';
-                resultDiv.classList.remove('d-none');
-                verifyBtn.disabled = false;
-            }
-        } catch (e) {
-            resultDiv.className = 'mt-4 alert alert-danger';
-            resultDiv.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error: ' + e.message;
-            resultDiv.classList.remove('d-none');
-            verifyBtn.disabled = false;
+    }
+
+    function stopCamera() {
+        if (globalStream) {
+            globalStream.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+            video.classList.add('d-none');
+            placeholderDiv.classList.remove('d-none');
+            globalStream = null;
         }
+    }
+
+    verifyBtn.addEventListener("click", () => {
+        if (!globalStream) {
+            startCamera();
+            verifyBtnText.textContent = "Verify";
+            verifyBtn.innerHTML = '<i class="bi bi-shield-check"></i> <span id="verifyBtnText">Verify</span>';
+            return;
+        }
+        if (!video.videoWidth) {
+            alert("Camera still starting up. Please wait.");
+            return;
+        }
+
+        const context = canvas.getContext("2d");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataURL = canvas.toDataURL("image/jpeg", 0.9);
+
+        scanOverlay.classList.remove('d-none');
+        resultText.textContent = "Verifying...";
+        resultText.className = "fw-semibold small";
+        resultText.style.color = "#3b82f6";
+        statusIndicator.style.background = "#3b82f6";
+        verifyBtn.disabled = true;
+        verifyBtn.classList.add('disabled');
+
+        fetch("{% url 'biometric_verify_descriptor' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+            body: JSON.stringify({ image: dataURL })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "ok") {
+                statusIndicator.style.background = "#198754";
+                resultText.textContent = "Verification Successful!";
+                resultText.className = "fw-semibold small text-success";
+                setTimeout(() => { window.location.href = "{{ next_url }}"; }, 1000);
+            } else {
+                statusIndicator.style.background = "#dc3545";
+                resultText.textContent = data.message || "Verification Failed";
+                resultText.className = "fw-semibold small text-danger";
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            resultText.textContent = "Network Error";
+            resultText.className = "fw-semibold small text-danger";
+            statusIndicator.style.background = "#dc3545";
+        })
+        .finally(() => {
+            scanOverlay.classList.add('d-none');
+            verifyBtn.disabled = false;
+            verifyBtn.classList.remove('disabled');
+            stopCamera();
+        });
     });
-});
 </script>
 {% endblock %}

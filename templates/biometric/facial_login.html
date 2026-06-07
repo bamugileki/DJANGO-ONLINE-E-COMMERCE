@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Face Enrollment{% endblock %}
+{% block title %}Login with Face{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center fade-in-up">
@@ -10,16 +10,10 @@
             <div class="profile-avatar" style="width:70px;height:70px;font-size:2rem;margin:0 auto 1rem;">
                 <i class="bi bi-camera"></i>
             </div>
-            <h4 class="fw-bold">Face Enrollment</h4>
-            {% if has_face %}
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> You already have a face enrolled. Capture again to update it.
-                </div>
-            {% else %}
-                <p class="text-muted mb-4">Enroll your face for biometric authentication. Position your face within the frame and click capture.</p>
-            {% endif %}
+            <h4 class="fw-bold">Login with Face</h4>
+            <p class="text-muted mb-4">Position your face within the frame and click authenticate</p>
 
-            <div class="position-relative rounded-4 overflow-hidden border border-2 border-success mb-4 mx-auto" style="max-width:480px;aspect-ratio:4/3;background:#1a1a2e;">
+            <div class="position-relative rounded-4 overflow-hidden border border-2 border-primary mb-4 mx-auto" style="max-width:480px;aspect-ratio:4/3;background:#1a1a2e;">
                 <div id="placeholderDiv" class="d-flex align-items-center justify-content-center h-100 text-white-50">
                     <div>
                         <i class="bi bi-camera" style="font-size:3rem;display:block;margin-bottom:0.5rem;"></i>
@@ -28,13 +22,13 @@
                 </div>
                 <video id="video" autoplay playsinline class="w-100 h-100 object-fit-cover d-none"></video>
                 <canvas id="canvas" class="d-none"></canvas>
-                <div id="scanOverlay" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(16,185,129,0.1);pointer-events:none;">
+                <div id="scanOverlay" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(59,130,246,0.1);pointer-events:none;">
                     <div class="scan-line"></div>
                 </div>
             </div>
 
-            <button type="button" id="enrollBtn" class="btn btn-gradient btn-lg w-100 btn-sparkle mb-3">
-                <i class="bi bi-camera"></i> <span id="enrollBtnText">Start Camera</span>
+            <button type="button" id="authBtn" class="btn btn-gradient btn-lg w-100 btn-sparkle mb-3">
+                <i class="bi bi-camera"></i> <span id="authBtnText">Start Camera</span>
             </button>
 
             <div class="p-3 bg-light rounded-3 mb-3">
@@ -44,9 +38,11 @@
                 </div>
             </div>
 
-            <a href="{% url 'profile' %}" class="text-decoration-none fw-bold" style="color:var(--primary);">
-                <i class="bi bi-arrow-left"></i> Back to Profile
-            </a>
+            <div class="mt-3">
+                <a href="{% url 'login' %}" class="text-decoration-none fw-bold" style="color:var(--primary);">
+                    <i class="bi bi-arrow-left"></i> Back to Password Login
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -56,8 +52,8 @@
         position: absolute;
         width: 100%;
         height: 2px;
-        background: #10b981;
-        box-shadow: 0 0 15px rgba(16,185,129,0.8);
+        background: #3b82f6;
+        box-shadow: 0 0 15px rgba(59,130,246,0.8);
         animation: scan 2s ease-in-out infinite;
         top: 10%;
     }
@@ -71,15 +67,14 @@
 <script>
     const video = document.getElementById("video");
     const canvas = document.getElementById("canvas");
-    const enrollBtn = document.getElementById("enrollBtn");
-    const enrollBtnText = document.getElementById("enrollBtnText");
+    const authBtn = document.getElementById("authBtn");
+    const authBtnText = document.getElementById("authBtnText");
     const resultText = document.getElementById("resultText");
     const statusIndicator = document.getElementById("statusIndicator");
     const scanOverlay = document.getElementById("scanOverlay");
     const placeholderDiv = document.getElementById("placeholderDiv");
 
     let globalStream = null;
-    const csrfToken = "{{ csrf_token }}";
 
     function startCamera() {
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
@@ -88,11 +83,11 @@
                 video.srcObject = stream;
                 video.classList.remove('d-none');
                 placeholderDiv.classList.add('d-none');
-                resultText.textContent = "Camera Online - Click to Capture";
+                resultText.textContent = "Camera Online - Click Authenticate";
                 resultText.className = "fw-semibold small";
                 resultText.style.color = "#333";
-                statusIndicator.style.background = "#10b981";
-                statusIndicator.style.boxShadow = "0 0 10px rgba(16,185,129,1)";
+                statusIndicator.style.background = "#3b82f6";
+                statusIndicator.style.boxShadow = "0 0 10px rgba(59,130,246,1)";
             })
             .catch(err => {
                 console.error("Camera Error:", err);
@@ -112,11 +107,11 @@
         }
     }
 
-    enrollBtn.addEventListener("click", () => {
+    authBtn.addEventListener("click", () => {
         if (!globalStream) {
             startCamera();
-            enrollBtnText.textContent = "Capture & Enroll";
-            enrollBtn.innerHTML = '<i class="bi bi-camera"></i> <span id="enrollBtnText">Capture & Enroll</span>';
+            authBtnText.textContent = "Authenticate";
+            authBtn.innerHTML = '<i class="bi bi-camera"></i> <span id="authBtnText">Authenticate</span>';
             return;
         }
         if (!video.videoWidth) {
@@ -131,27 +126,30 @@
         const dataURL = canvas.toDataURL("image/jpeg", 0.9);
 
         scanOverlay.classList.remove('d-none');
-        resultText.textContent = "Processing...";
+        resultText.textContent = "Verifying...";
         resultText.className = "fw-semibold small";
-        resultText.style.color = "#10b981";
-        statusIndicator.style.background = "#10b981";
-        enrollBtn.disabled = true;
-        enrollBtn.classList.add('disabled');
+        resultText.style.color = "#3b82f6";
+        statusIndicator.style.background = "#3b82f6";
+        authBtn.disabled = true;
+        authBtn.classList.add('disabled');
 
-        fetch("{% url 'biometric_save' %}", {
+        fetch("{% url 'biometric_facial_login_verify' %}", {
             method: "POST",
-            headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
             body: JSON.stringify({ image: dataURL })
         })
         .then(response => response.json())
         .then(data => {
             if (data.status === "ok") {
                 statusIndicator.style.background = "#198754";
-                resultText.textContent = data.message || "Face enrolled successfully!";
+                resultText.textContent = "Login Successful! Redirecting...";
                 resultText.className = "fw-semibold small text-success";
+                if (data.redirect) {
+                    setTimeout(() => { window.location.href = data.redirect; }, 800);
+                }
             } else {
                 statusIndicator.style.background = "#dc3545";
-                resultText.textContent = data.message || "Enrollment Failed";
+                resultText.textContent = data.message || "Authentication Failed";
                 resultText.className = "fw-semibold small text-danger";
             }
         })
@@ -163,8 +161,8 @@
         })
         .finally(() => {
             scanOverlay.classList.add('d-none');
-            enrollBtn.disabled = false;
-            enrollBtn.classList.remove('disabled');
+            authBtn.disabled = false;
+            authBtn.classList.remove('disabled');
             stopCamera();
         });
     });

@@ -7,6 +7,7 @@ urlpatterns = [
     path('vendors/approve/<int:vendor_id>/', views.vendor_approve, name='vendor_approve'),
     path('vendors/reject/<int:vendor_id>/', views.vendor_reject, name='vendor_reject'),
     path('users/', views.manage_users, name='manage_users'),
+    path('users/<int:user_id>/set-password/', views.set_user_password, name='set_user_password'),
     path('employees/', views.manage_employees, name='manage_employees'),
     path('admin/<slug:app_label>/<slug:model_name>/', views.model_list, name='model_list'),
     path('admin/<slug:app_label>/<slug:model_name>/add/', views.model_add, name='model_add'),

@@ -82,6 +82,25 @@ def manage_users(request):
 
 @login_required
 @role_required('admin', 'manager')
+def set_user_password(request, user_id):
+    target = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        confirm = request.POST.get('confirm_password')
+        if not password or len(password) < 8:
+            messages.error(request, 'Password must be at least 8 characters.')
+        elif password != confirm:
+            messages.error(request, 'Passwords do not match.')
+        else:
+            target.set_password(password)
+            target.save()
+            messages.success(request, f'Password for {target.username} updated successfully.')
+            return redirect('manage_users')
+    return render(request, 'dashboard/set_password.html', {'target': target})
+
+
+@login_required
+@role_required('admin', 'manager')
 def manage_employees(request):
     from accounts.models import EmployeeProfile
     employees = EmployeeProfile.objects.select_related('user').all()

@@ -265,6 +265,12 @@
                 <a href="{% url 'vendor_approvals' %}"><i class="bi bi-shop"></i> Vendor Approvals {% if pending_vendors %}<span class="badge bg-danger ms-1">{{ pending_vendors }}</span>{% endif %}</a>
                 <a href="{% url 'manage_users' %}"><i class="bi bi-people"></i> Manage Users</a>
                 <a href="{% url 'manage_employees' %}"><i class="bi bi-person-badge"></i> Employees</a>
+                <a href="{% url 'model_list' app_label='cms' model_name='sitesettings' %}">
+                    <i class="bi bi-gear"></i> Site Settings
+                    {% if not site_settings.facial_login_enabled %}
+                    <span class="badge bg-warning ms-1">Face Auth OFF</span>
+                    {% endif %}
+                </a>
             </div>
         </div>
 
