@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     'loyalty',
     'payroll',
     'dashboard',
+    'biometric',
+    'surveys',
 ]
 
 MIDDLEWARE = [
@@ -97,3 +99,6 @@ LOGIN_REDIRECT_URL = '/'
 
 STRIPE_PUBLISHABLE_KEY = 'pk_test_placeholder'
 STRIPE_SECRET_KEY = 'sk_test_placeholder'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@mimicmeshop.com'

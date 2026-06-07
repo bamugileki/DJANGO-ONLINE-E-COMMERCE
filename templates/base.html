@@ -119,6 +119,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{% url 'biometric_enrollment' %}">
+                                <i class="bi bi-camera"></i> Face Auth
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{% url 'logout' %}">
                                 <i class="bi bi-box-arrow-right"></i> Logout
                             </a>
@@ -209,5 +214,6 @@
             });
         });
     </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
