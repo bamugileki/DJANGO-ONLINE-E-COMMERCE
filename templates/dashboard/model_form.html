@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load dashboard_extras %}
+
+{% block title %}{% if is_edit %}Edit{% else %}Add{% endif %} {{ meta.name }} - Admin{% endblock %}
+
+{% block content %}
+<style>
+    .admin-sidebar {
+        border-radius: 16px;
+        border: 1px solid #f0f0f0;
+        overflow: hidden;
+        position: sticky;
+        top: 90px;
+    }
+    .admin-sidebar .sidebar-header {
+        background: linear-gradient(135deg, #1a1a2e, #2d3436);
+        color: #fff;
+        padding: 16px 20px;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+    .admin-sidebar .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        text-decoration: none;
+        color: #2d3436;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+    }
+    .admin-sidebar .sidebar-item:hover {
+        background: #f8f7ff;
+        border-left-color: #6c5ce7;
+    }
+    .admin-sidebar .sidebar-item.active {
+        background: #f0edff;
+        border-left-color: #6c5ce7;
+        color: #6c5ce7;
+        font-weight: 600;
+    }
+    .admin-sidebar .app-group {
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .admin-sidebar .app-label {
+        padding: 10px 20px 4px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #b2bec3;
+        font-weight: 700;
+    }
+    .form-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        overflow: hidden;
+    }
+    .form-card .form-header {
+        background: linear-gradient(135deg, #1a1a2e, #2d3436);
+        color: #fff;
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .form-card .form-header h5 {
+        margin: 0;
+        font-weight: 700;
+    }
+    .form-card .form-body {
+        padding: 30px;
+    }
+    .form-card .form-body label {
+        font-weight: 600;
+        color: #2d3436;
+        font-size: 0.88rem;
+        margin-bottom: 4px;
+    }
+    .form-card .form-body input,
+    .form-card .form-body textarea,
+    .form-card .form-body select {
+        border: 2px solid #e8e8e8;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 0.88rem;
+        width: 100%;
+        transition: all 0.3s;
+    }
+    .form-card .form-body input:focus,
+    .form-card .form-body textarea:focus,
+    .form-card .form-body select:focus {
+        border-color: #6c5ce7;
+        box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
+        outline: none;
+    }
+    .form-card .form-body .form-group {
+        margin-bottom: 20px;
+    }
+    .form-card .form-body .helptext {
+        font-size: 0.78rem;
+        color: #b2bec3;
+        margin-top: 4px;
+    }
+    .form-card .form-body ul.errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 6px;
+    }
+    .form-card .form-body ul.errorlist li {
+        color: #e17055;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+</style>
+
+<div class="row g-4">
+    <div class="col-lg-3">
+        <div class="admin-sidebar">
+            <div class="sidebar-header"><i class="bi bi-grid"></i> Model Manager</div>
+            {% for app, models in apps_data.items %}
+            <div class="app-group">
+                <div class="app-label"><i class="{{ APP_ICONS|dict_key:app }}"></i> {{ app|title }}</div>
+                {% for m in models %}
+                <a href="{% url 'model_list' app_label=app model_name=m.model_name %}"
+                   class="sidebar-item {% if app_label == app and model_name == m.model_name %}active{% endif %}">
+                    <i class="{{ m.icon }}" style="width:18px;text-align:center;"></i> {{ m.name }}
+                </a>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        <div class="form-card">
+            <div class="form-header">
+                <a href="{% url 'model_list' app_label=app_label model_name=model_name %}" class="btn btn-sm" style="background:rgba(255,255,255,0.15);color:#fff;border-radius:8px;text-decoration:none;">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <h5><i class="{{ meta.icon }} me-2"></i> {% if is_edit %}Edit{% else %}Add{% endif %} {{ meta.name }}</h5>
+            </div>
+            <div class="form-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                        <div class="helptext">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                        <ul class="errorlist"><li>{{ error }}</li></ul>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn" style="background:linear-gradient(135deg,#6c5ce7,#5a4bd1);color:#fff;border-radius:10px;font-weight:600;padding:10px 28px;">
+                            <i class="bi bi-check-lg"></i> {% if is_edit %}Update{% else %}Create{% endif %}
+                        </button>
+                        <a href="{% url 'model_list' app_label=app_label model_name=model_name %}" class="btn" style="border:2px solid #e8e8e8;border-radius:10px;font-weight:600;padding:10px 28px;">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

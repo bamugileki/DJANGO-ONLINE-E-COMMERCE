@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Rights - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card p-5 fade-in-up">
+            <h1 class="fw-bold mb-2">Admin Rights Policy</h1>
+            <p class="text-muted mb-4">Admin is the highest authority in MimicME Shop and has unrestricted access to all modules and data.</p>
+
+            <h4 class="fw-bold mt-4 mb-3">Users</h4>
+            <ul class="text-muted">
+                <li>Create, read, update, delete Admins</li>
+                <li>Create, manage Managers</li>
+                <li>Approve/suspend Vendors</li>
+                <li>Manage Customers</li>
+            </ul>
+
+            <h4 class="fw-bold mt-4 mb-3">System</h4>
+            <ul class="text-muted">
+                <li>Products</li>
+                <li>Orders</li>
+                <li>Payments</li>
+                <li>Refunds</li>
+                <li>Shipping</li>
+                <li>Reports</li>
+                <li>Settings</li>
+            </ul>
+
+            <h4 class="fw-bold mt-4 mb-3">Permissions</h4>
+            <ul class="text-muted">
+                <li>Assign roles</li>
+                <li>Change user privileges</li>
+                <li>Override system restrictions</li>
+            </ul>
+
+            <h4 class="fw-bold mt-4 mb-3">Security</h4>
+            <ul class="text-muted">
+                <li>View logs</li>
+                <li>Block users</li>
+                <li>Reset passwords</li>
+                <li>Manage system backups</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

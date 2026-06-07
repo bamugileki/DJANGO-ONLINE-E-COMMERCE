@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load dashboard_extras %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    .admin-sidebar {
+        border-radius: 16px;
+        border: 1px solid #f0f0f0;
+        overflow: hidden;
+        position: sticky;
+        top: 90px;
+    }
+    .admin-sidebar .sidebar-header {
+        background: linear-gradient(135deg, #1a1a2e, #2d3436);
+        color: #fff;
+        padding: 16px 20px;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+    .admin-sidebar .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        text-decoration: none;
+        color: #2d3436;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+    }
+    .admin-sidebar .sidebar-item:hover {
+        background: #f8f7ff;
+        border-left-color: #6c5ce7;
+    }
+    .admin-sidebar .app-group {
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .admin-sidebar .app-label {
+        padding: 10px 20px 4px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #b2bec3;
+        font-weight: 700;
+    }
+    .stat-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        cursor: pointer;
+    }
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    .stat-card .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    .stat-card .stat-value {
+        font-size: 2.2rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+    .stat-card .stat-label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        opacity: 0.8;
+    }
+    .stat-card .stat-bg-icon {
+        position: absolute;
+        right: -10px;
+        bottom: -10px;
+        font-size: 6rem;
+        opacity: 0.08;
+    }
+    .card-modern {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    .card-modern:hover {
+        box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    }
+    .card-modern .card-header-custom {
+        padding: 18px 24px;
+        font-weight: 700;
+        font-size: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .card-modern .card-body-custom {
+        padding: 20px 24px;
+    }
+    .badge-status {
+        padding: 5px 14px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+    .badge-status.pending { background: #fff3e0; color: #e65100; }
+    .badge-status.processing { background: #e3f2fd; color: #1565c0; }
+    .badge-status.shipped { background: #f3e5f5; color: #7b1fa2; }
+    .badge-status.delivered { background: #e8f5e9; color: #2e7d32; }
+    .badge-status.cancelled { background: #ffebee; color: #c62828; }
+    .badge-status.paid { background: #e8f5e9; color: #2e7d32; }
+    .badge-status.unpaid { background: #fff3e0; color: #e65100; }
+    .table-dashboard thead th {
+        border: none;
+        background: #f8f9fa;
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #636e72;
+        padding: 12px 16px;
+    }
+    .table-dashboard tbody td {
+        padding: 12px 16px;
+        border-color: #f0f0f0;
+        vertical-align: middle;
+    }
+    .table-dashboard tbody tr:hover {
+        background: #f8f9fa;
+    }
+    .progress-stock {
+        height: 6px;
+        border-radius: 10px;
+        background: #f0f0f0;
+    }
+    .progress-stock .progress-bar {
+        border-radius: 10px;
+    }
+    .quick-action {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: #2d3436;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    .quick-action:hover {
+        border-color: #6c5ce7;
+        background: #f8f7ff;
+        transform: translateX(5px);
+        color: #6c5ce7;
+    }
+    .greeting-banner {
+        background: linear-gradient(135deg, #1a1a2e 0%, #2d3436 100%);
+        border-radius: 20px;
+        padding: 30px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    .greeting-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(108,92,231,0.3) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+    .greeting-banner h1 {
+        font-weight: 800;
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+        position: relative;
+    }
+    .greeting-banner p {
+        opacity: 0.8;
+        margin: 0;
+        position: relative;
+        font-size: 0.95rem;
+    }
+    .greeting-banner .greeting-actions {
+        position: relative;
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .greeting-banner .greeting-actions a {
+        background: rgba(255,255,255,0.15);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: all 0.3s;
+        backdrop-filter: blur(10px);
+    }
+    .greeting-banner .greeting-actions a:hover {
+        background: rgba(255,255,255,0.25);
+        transform: translateY(-2px);
+    }
+    .vendor-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+    }
+    .vendor-indicator.active { background: #00b894; }
+    .vendor-indicator.inactive { background: #e17055; }
+    .vendor-indicator.pending { background: #fdcb6e; }
+    @keyframes countUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .count-anim { animation: countUp 0.6s ease forwards; }
+    .count-anim:nth-child(1) { animation-delay: 0.1s; }
+    .count-anim:nth-child(2) { animation-delay: 0.2s; }
+    .count-anim:nth-child(3) { animation-delay: 0.3s; }
+    .count-anim:nth-child(4) { animation-delay: 0.4s; }
+</style>
+
+<div class="row g-4">
+    <div class="col-lg-3">
+        <div class="admin-sidebar">
+            <div class="sidebar-header"><i class="bi bi-grid"></i> Model Manager</div>
+            {% for app, models in apps_data.items %}
+            <div class="app-group">
+                <div class="app-label"><i class="{{ APP_ICONS|dict_key:app }}"></i> {{ app|title }}</div>
+                {% for m in models %}
+                <a href="{% url 'model_list' app_label=app model_name=m.model_name %}" class="sidebar-item">
+                    <i class="{{ m.icon }}" style="width:18px;text-align:center;"></i> {{ m.name }}
+                </a>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        <div class="greeting-banner mb-4 fade-in-up">
+            <h1><i class="bi bi-speedometer2"></i> Welcome back, {{ request.user.username }}</h1>
+            <p>Here's what's happening with your store today.</p>
+            <div class="greeting-actions">
+                <a href="{% url 'vendor_approvals' %}"><i class="bi bi-shop"></i> Vendor Approvals {% if pending_vendors %}<span class="badge bg-danger ms-1">{{ pending_vendors }}</span>{% endif %}</a>
+                <a href="{% url 'manage_users' %}"><i class="bi bi-people"></i> Manage Users</a>
+                <a href="{% url 'manage_employees' %}"><i class="bi bi-person-badge"></i> Employees</a>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-3 count-anim">
+                <div class="stat-card card text-white" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stat-value">{{ total_orders }}</div>
+                                <div class="stat-label">Total Orders</div>
+                            </div>
+                            <div class="stat-icon" style="background:rgba(255,255,255,0.2);">
+                                <i class="bi bi-truck"></i>
+                            </div>
+                        </div>
+                        <i class="bi bi-box-seam stat-bg-icon"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 count-anim">
+                <div class="stat-card card text-white" style="background:linear-gradient(135deg,#00b894,#00cec9);">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stat-value">{{ site_settings.currency }} {{ total_revenue|floatformat:0 }}</div>
+                                <div class="stat-label">Total Revenue</div>
+                            </div>
+                            <div class="stat-icon" style="background:rgba(255,255,255,0.2);">
+                                <i class="bi bi-cash"></i>
+                            </div>
+                        </div>
+                        <i class="bi bi-cash-stack stat-bg-icon"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 count-anim">
+                <div class="stat-card card text-white" style="background:linear-gradient(135deg,#fd79a8,#e84393);">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stat-value">{{ total_users }}</div>
+                                <div class="stat-label">Total Users</div>
+                            </div>
+                            <div class="stat-icon" style="background:rgba(255,255,255,0.2);">
+                                <i class="bi bi-people"></i>
+                            </div>
+                        </div>
+                        <i class="bi bi-person-badge stat-bg-icon"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 count-anim">
+                <div class="stat-card card text-white" style="background:linear-gradient(135deg,#fdcb6e,#e17055);">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stat-value">{{ total_products }}</div>
+                                <div class="stat-label">Products</div>
+                            </div>
+                            <div class="stat-icon" style="background:rgba(255,255,255,0.2);">
+                                <i class="bi bi-box"></i>
+                            </div>
+                        </div>
+                        <i class="bi bi-box-seam stat-bg-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card-modern card">
+                    <div class="card-header-custom">
+                        <i class="bi bi-truck" style="color:var(--primary);"></i> Recent Orders
+                        <span class="badge bg-secondary ms-auto">{{ recent_orders|length }} orders</span>
+                    </div>
+                    <div class="card-body-custom p-0">
+                        <table class="table table-dashboard mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td><strong>#{{ order.id }}</strong></td>
+                                    <td>{{ order.first_name }} {{ order.last_name }}</td>
+                                    <td><strong>{{ site_settings.currency }} {{ order.get_total_cost|intcomma }}</strong></td>
+                                    <td><span class="badge-status {% if order.paid %}paid{% else %}unpaid{% endif %}">{% if order.paid %}<i class="bi bi-check-circle"></i> Paid{% else %}<i class="bi bi-clock"></i> Pending{% endif %}</span></td>
+                                    <td><span class="badge-status {{ order.status }}">{{ order.get_status_display }}</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center text-muted py-4">No orders yet</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card-modern card mb-4">
+                    <div class="card-header-custom">
+                        <i class="bi bi-exclamation-triangle" style="color:#e17055;"></i> Low Stock Alerts
+                        <span class="badge bg-danger ms-auto">{{ low_stock_products|length }}</span>
+                    </div>
+                    <div class="card-body-custom">
+                        {% for product in low_stock_products %}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-semibold small">{{ product.name|truncatechars:22 }}</span>
+                                <span class="badge {% if product.stock == 0 %}bg-danger{% else %}bg-warning{% endif %}">{{ product.stock }}</span>
+                            </div>
+                            <div class="progress progress-stock">
+                                {% widthratio product.stock 100 100 as pct %}
+                                {% if pct|add:"0" > 100 %}{% widthratio product.stock 100 1 as pct %}{% endif %}
+                                <div class="progress-bar {% if product.stock == 0 %}bg-danger{% else %}bg-warning{% endif %}" style="width:{% if product.stock > 50 %}100{% else %}{{ product.stock|add:'0' }}{% endif %}%"></div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center mb-0"><i class="bi bi-check-circle text-success"></i> All products stocked!</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-modern card">
+                    <div class="card-header-custom">
+                        <i class="bi bi-shop" style="color:var(--accent);"></i> Vendors
+                        <span class="badge bg-secondary ms-auto">{{ vendors|length }}</span>
+                    </div>
+                    <div class="card-body-custom">
+                        {% for vendor in vendors %}
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <span class="vendor-indicator {% if vendor.is_approved and vendor.is_active %}active{% elif not vendor.is_active %}inactive{% else %}pending{% endif %}"></span>
+                                <span class="fw-semibold small">{{ vendor.business_name|truncatechars:20 }}</span>
+                            </div>
+                            <span class="small text-muted">{{ site_settings.currency }} {{ vendor.total_earnings|intcomma }}</span>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center mb-0">No vendors yet</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card-modern card">
+                    <div class="card-header-custom">
+                        <i class="bi bi-lightning" style="color:#fdcb6e;"></i> Quick Actions
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <a href="{% url 'model_add' app_label='products' model_name='product' %}" class="quick-action">
+                                    <i class="bi bi-plus-circle" style="color:#6c5ce7;font-size:1.3rem;"></i> Add Product
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'model_list' app_label='orders' model_name='order' %}" class="quick-action">
+                                    <i class="bi bi-truck" style="color:#00b894;font-size:1.3rem;"></i> View Orders
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'model_list' app_label='vendor' model_name='vendor' %}" class="quick-action">
+                                    <i class="bi bi-shop" style="color:#fd79a8;font-size:1.3rem;"></i> Manage Vendors
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'manage_users' %}" class="quick-action">
+                                    <i class="bi bi-people" style="color:#e17055;font-size:1.3rem;"></i> Manage Users
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

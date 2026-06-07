@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+    <h1 class="page-title"><i class="bi bi-person-circle"></i> My Profile</h1>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 fade-in-up">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        {{ user.username|first|upper }}
+                    </div>
+                    <h4 class="fw-bold mb-1">{{ user.username }}</h4>
+                    <p class="mb-0 opacity-75"><i class="bi bi-envelope"></i> {{ user.email }}</p>
+                    <span class="badge bg-light text-dark mt-2">{{ user.profile.get_role_display }}</span>
+                </div>
+                <div class="profile-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small mt-1">{{ field.errors }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-gradient w-100 btn-sparkle">
+                            <i class="bi bi-check-circle"></i> Save Changes
+                        </button>
+                    </form>
+                    <hr>
+                    <div class="d-flex justify-content-between py-2">
+                        <span class="text-muted"><i class="bi bi-calendar"></i> Member Since</span>
+                        <span class="fw-semibold">{{ user.date_joined|date:"F j, Y" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2">
+                        <span class="text-muted"><i class="bi bi-shield"></i> Role</span>
+                        <span class="fw-semibold">{{ user.profile.get_role_display }}</span>
+                    </div>
+                    <a href="{% url 'order_history' %}" class="btn btn-gradient w-100 mt-3 btn-sparkle">
+                        <i class="bi bi-box"></i> View Order History
+                    </a>
+                    <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary w-100 mt-2">
+                        <i class="bi bi-key"></i> Change Password
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .profile-body input {
+            border-radius: var(--radius-sm);
+            border: 2px solid #e8e8e8;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .profile-body input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
+            outline: none;
+        }
+    </style>
+{% endblock %}

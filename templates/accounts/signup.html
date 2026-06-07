@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Account{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center fade-in-up">
+    <div class="col-md-8 col-lg-7">
+        <div class="card-form">
+            <div class="text-center mb-4">
+                <div class="profile-avatar" style="width:70px;height:70px;font-size:2rem;">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <h4 class="fw-bold mt-3">Create Customer Account</h4>
+                <p class="text-muted">Join us and start shopping!</p>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+
+                <h6 class="fw-bold mb-3" style="color:var(--primary);"><i class="bi bi-person"></i> Personal Information</h6>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">First Name *</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}<div class="text-danger small">{{ form.first_name.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Last Name *</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}<div class="text-danger small">{{ form.last_name.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email Address *</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone Number *</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}<div class="text-danger small">{{ form.phone.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <h6 class="fw-bold mb-3 mt-4" style="color:var(--primary);"><i class="bi bi-lock"></i> Password</h6>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Password *</label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}<div class="text-danger small">{{ form.password1.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Confirm Password *</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}<div class="text-danger small">{{ form.password2.errors }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <h6 class="fw-bold mb-3 mt-4" style="color:var(--primary);"><i class="bi bi-geo-alt"></i> Address Information</h6>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-12">
+                        <label class="form-label">Street Address *</label>
+                        {{ form.address_line1 }}
+                        {% if form.address_line1.errors %}<div class="text-danger small">{{ form.address_line1.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">City *</label>
+                        {{ form.city }}
+                        {% if form.city.errors %}<div class="text-danger small">{{ form.city.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Country *</label>
+                        {{ form.country }}
+                        {% if form.country.errors %}<div class="text-danger small">{{ form.country.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Postal Code</label>
+                        {{ form.postal_code }}
+                        {% if form.postal_code.errors %}<div class="text-danger small">{{ form.postal_code.errors }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <h6 class="fw-bold mb-3 mt-4" style="color:var(--primary);"><i class="bi bi-check-circle"></i> Agreements</h6>
+                <div class="mb-3 form-check">
+                    {{ form.accept_terms }}
+                    <label class="form-check-label" for="{{ form.accept_terms.id_for_label }}">
+                        I accept the <a href="#" class="fw-bold" style="color:var(--primary);">Terms &amp; Conditions</a> and <a href="#" class="fw-bold" style="color:var(--primary);">Privacy Policy</a> *
+                    </label>
+                    {% if form.accept_terms.errors %}<div class="text-danger small">{{ form.accept_terms.errors }}</div>{% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-gradient w-100 btn-lg btn-sparkle">
+                    <i class="bi bi-person-check"></i> Create Account
+                </button>
+            </form>
+            <p class="text-center mt-3 mb-0">
+                Already have an account? <a href="{% url 'login' %}" class="fw-bold" style="color:var(--primary);">Login</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-form input, .card-form select, .card-form textarea {
+        border-radius: var(--radius-sm);
+        border: 2px solid #e8e8e8;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    .card-form input:focus, .card-form select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
+        outline: none;
+    }
+    .card-form .form-check-input {
+        width: auto;
+        margin-right: 0.5rem;
+    }
+    .card-form .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 0.25rem 0 0;
+        color: #dc3545;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}

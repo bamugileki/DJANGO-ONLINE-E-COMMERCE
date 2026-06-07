@@ -1,0 +1,429 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+    <a href="{% url 'admin:index' %}" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+        <span style="font-size:1.5rem;font-weight:800;background:linear-gradient(135deg,#6c5ce7,#fd79a8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{{ site_settings.site_name }}</span>
+    </a>
+</div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block extrastyle %}
+<style>
+    :root {
+        --primary: #6c5ce7;
+        --secondary: #5a4bd1;
+        --accent: #fd79a8;
+        --header-bg: #1a1a2e;
+        --header-color: #fff;
+        --breadcrumbs-bg: #2d3436;
+        --link-fg: #6c5ce7;
+        --link-hover-color: #5a4bd1;
+        --button-bg: #6c5ce7;
+        --button-hover-bg: #5a4bd1;
+        --object-tools-bg: #6c5ce7;
+        --delete-button-bg: #e17055;
+        --delete-button-hover-bg: #d63031;
+        --close-button-bg: #636e72;
+        --close-button-hover-bg: #2d3436;
+        --darkened-bg: #f8f9fa;
+        --selected-bg: #e8e5ff;
+    }
+    @keyframes slideDown {
+        from { transform: translateY(-100%); opacity: 0; }
+        to   { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes gradientShift {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    @keyframes brandGlow {
+        0%, 100% { filter: brightness(1); }
+        50%      { filter: brightness(1.3); }
+    }
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        padding-top: 50px;
+    }
+    #header {
+        background: linear-gradient(135deg, #1a1a2e, #2d3436, #1a1a2e, #16213e);
+        background-size: 300% 300%;
+        animation: slideDown 0.6s ease-out, gradientShift 8s ease infinite;
+        padding: 15px 30px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.2);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        width: 100%;
+        border-bottom: 1px solid rgba(108,92,231,0.15);
+        transition: box-shadow 0.3s ease;
+    }
+    #header:hover {
+        box-shadow: 0 4px 35px rgba(108,92,231,0.15);
+    }
+    #branding h1, #branding h1 a:link, #branding h1 a:visited {
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+    #branding h1 a:hover {
+        animation: brandGlow 1.5s ease infinite;
+    }
+    #user-tools {
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    #user-tools a {
+        color: rgba(255,255,255,0.75);
+        transition: all 0.3s ease;
+        position: relative;
+        padding: 4px 10px;
+        border-radius: 6px;
+    }
+    #user-tools a:hover {
+        color: #fff;
+        background: rgba(255,255,255,0.1);
+        transform: translateY(-1px);
+    }
+    #user-tools a:active {
+        transform: translateY(0);
+    }
+    .module h2, .module caption, .inline-group h2 {
+        background: linear-gradient(135deg, #6c5ce7, #5a4bd1);
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        border-radius: 4px 4px 0 0;
+    }
+    div.breadcrumbs {
+        background: #2d3436;
+        padding: 10px 30px;
+        font-size: 0.8rem;
+    }
+    div.breadcrumbs a {
+        color: rgba(255,255,255,0.8);
+    }
+    div.breadcrumbs a:hover {
+        color: #fff;
+    }
+    @keyframes btnPulse {
+        0% { box-shadow: 0 4px 15px rgba(108,92,231,0.3); }
+        50% { box-shadow: 0 4px 25px rgba(108,92,231,0.5); }
+        100% { box-shadow: 0 4px 15px rgba(108,92,231,0.3); }
+    }
+    @keyframes btnShimmer {
+        0% { background-position: -200% center; }
+        100% { background-position: 200% center; }
+    }
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        background: linear-gradient(135deg, #6c5ce7, #5a4bd1);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 22px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        letter-spacing: 0.3px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    .button::after, input[type=submit]::after, input[type=button]::after, .submit-row input::after, a.button::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+        background-size: 200% 100%;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .button:hover, input[type=submit]:hover, input[type=button]:hover {
+        background: linear-gradient(135deg, #5a4bd1, #4a3db8);
+        box-shadow: 0 6px 20px rgba(108,92,231,0.35);
+        transform: translateY(-2px);
+    }
+    .button:hover::after, input[type=submit]:hover::after, input[type=button]:hover::after {
+        opacity: 1;
+        animation: btnShimmer 1.5s ease infinite;
+    }
+    .button:active, input[type=submit]:active, input[type=button]:active {
+        transform: translateY(0) scale(0.98);
+    }
+    .button.default, input[type=submit].default, .submit-row input.default {
+        background: linear-gradient(135deg, #00b894, #00cec9);
+        animation: btnPulse 2.5s ease infinite;
+    }
+    .button.default:hover, input[type=submit].default:hover {
+        background: linear-gradient(135deg, #00a381, #00b894);
+        box-shadow: 0 6px 20px rgba(0,184,148,0.4);
+        transform: translateY(-2px);
+        animation: none;
+    }
+    .button.default:active {
+        animation: none;
+        transform: translateY(0) scale(0.98);
+    }
+    .deletelink {
+        background: linear-gradient(135deg, #e17055, #d63031);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 22px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        letter-spacing: 0.3px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(225,112,85,0.2);
+    }
+    .deletelink:hover {
+        background: linear-gradient(135deg, #d63031, #c0392b);
+        box-shadow: 0 6px 20px rgba(214,48,49,0.4);
+        transform: translateY(-2px);
+    }
+    .deletelink:active {
+        transform: translateY(0) scale(0.98);
+    }
+    .object-tools a {
+        background: linear-gradient(135deg, #6c5ce7, #5a4bd1);
+        border-radius: 8px;
+        padding: 8px 18px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(108,92,231,0.2);
+    }
+    .object-tools a:hover {
+        background: linear-gradient(135deg, #5a4bd1, #4a3db8);
+        box-shadow: 0 6px 20px rgba(108,92,231,0.35);
+        transform: translateY(-2px);
+    }
+    #content {
+        padding: 30px;
+    }
+    #content h1 {
+        font-weight: 700;
+        color: #2d3436;
+        font-size: 1.5rem;
+    }
+    .module {
+        border-radius: 12px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+        border: none;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+    .module table {
+        border-radius: 0 0 12px 12px;
+    }
+    #changelist {
+        border-radius: 12px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+        border: none;
+        overflow: hidden;
+    }
+    #changelist .actions {
+        padding: 12px;
+        background: #f8f9fa;
+    }
+    #changelist-filter {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+    #changelist-filter h2 {
+        background: linear-gradient(135deg, #6c5ce7, #5a4bd1);
+        border-radius: 12px 12px 0 0;
+    }
+    #changelist-filter li {
+        border-bottom: 1px solid #f0f0f0;
+    }
+    #changelist-filter a {
+        color: #2d3436;
+    }
+    #changelist-filter li.selected a {
+        color: #6c5ce7;
+        font-weight: 700;
+    }
+    .paginator {
+        background: #f8f9fa;
+        border-radius: 0 0 12px 12px;
+        padding: 12px;
+    }
+    .paginator a {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 6px 14px;
+        color: #6c5ce7;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .paginator a:hover {
+        background: #6c5ce7;
+        color: #fff;
+    }
+    .paginator .this-page {
+        background: #6c5ce7;
+        color: #fff;
+        border-radius: 6px;
+        padding: 6px 14px;
+        font-weight: 700;
+    }
+    .form-row {
+        padding: 12px 0;
+    }
+    .form-row label {
+        font-weight: 600;
+        color: #2d3436;
+    }
+    input, textarea, select {
+        border-radius: 8px !important;
+        border: 2px solid #e8e8e8 !important;
+        padding: 10px 12px !important;
+        transition: all 0.3s ease !important;
+    }
+    input:focus, textarea:focus, select:focus {
+        border-color: #6c5ce7 !important;
+        box-shadow: 0 0 0 3px rgba(108,92,231,0.15) !important;
+    }
+    .fieldBox {
+        border: none;
+    }
+    .inline-group {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+        overflow: hidden;
+    }
+    .inline-group .module {
+        box-shadow: none;
+        margin-bottom: 0;
+    }
+    .inline-related h3 {
+        background: linear-gradient(135deg, #dfe6e9, #b2bec3);
+        color: #2d3436;
+        font-weight: 600;
+        padding: 10px 12px;
+        border-bottom: none;
+    }
+    .dashboard #content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .dashboard .module {
+        flex: 1 1 45%;
+        min-width: 300px;
+    }
+    .dashboard .module table {
+        width: 100%;
+    }
+    .aligned label {
+        font-weight: 600;
+        color: #2d3436;
+    }
+    .quiet, a.quiet:link, a.quiet:visited {
+        color: #636e72;
+    }
+    .help {
+        font-size: 0.8rem;
+        color: #636e72;
+    }
+    .errornote {
+        background: #fff5f5;
+        border: 1px solid #e17055;
+        border-radius: 8px;
+        color: #e17055;
+        padding: 12px;
+    }
+    .success {
+        background: #f0fff4;
+        border: 1px solid #00b894;
+        border-radius: 8px;
+        color: #00b894;
+        padding: 12px;
+    }
+    .messagelist li {
+        border-radius: 8px;
+        padding: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+    .messagelist li.success {
+        background: #f0fff4;
+        border-left: 4px solid #00b894;
+    }
+    .messagelist li.error {
+        background: #fff5f5;
+        border-left: 4px solid #e17055;
+    }
+    .messagelist li.warning {
+        background: #fffdf0;
+        border-left: 4px solid #fdcb6e;
+    }
+    .messagelist li.info {
+        background: #f0f8ff;
+        border-left: 4px solid #6c5ce7;
+    }
+    td, th {
+        padding: 12px !important;
+    }
+    thead th {
+        background: #f8f9fa !important;
+        font-weight: 700 !important;
+        color: #2d3436 !important;
+        border-bottom: 2px solid #e0e0e0 !important;
+    }
+    tr:hover {
+        background: #e8e5ff !important;
+    }
+    .selector h2 {
+        background: linear-gradient(135deg, #6c5ce7, #5a4bd1);
+    }
+    .calendar {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+    }
+    .calendar caption {
+        background: linear-gradient(135deg, #6c5ce7, #5a4bd1);
+        color: #fff;
+        font-weight: 700;
+    }
+    .calendar td, .calendar th {
+        padding: 6px !important;
+    }
+    .calendar td a {
+        background: #6c5ce7;
+        color: #fff;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .calendar td a:hover {
+        background: #5a4bd1;
+    }
+    .nowrap {
+        white-space: nowrap;
+    }
+    @media (max-width: 767px) {
+        #header {
+            padding: 10px 15px;
+        }
+        #content {
+            padding: 15px;
+        }
+        .dashboard .module {
+            flex: 1 1 100%;
+        }
+    }
+</style>
+{% endblock %}

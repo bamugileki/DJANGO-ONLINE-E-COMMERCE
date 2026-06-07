@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Security Policy - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card p-5 fade-in-up">
+            <h1 class="fw-bold mb-2">Security Policy</h1>
+
+            <h4 class="fw-bold mt-4 mb-3">Protection Measures</h4>
+            <ul class="text-muted">
+                <li>Role-based access control (RBAC)</li>
+                <li>Two-factor authentication</li>
+                <li>Encrypted passwords (bcrypt)</li>
+                <li>Activity logs</li>
+            </ul>
+
+            <h4 class="fw-bold mt-4 mb-3">Monitoring</h4>
+            <ul class="text-muted">
+                <li>Login tracking</li>
+                <li>Fraud detection system</li>
+                <li>Suspicious activity alerts</li>
+            </ul>
+
+            <h4 class="fw-bold mt-4 mb-3">User Responsibility</h4>
+            <ul class="text-muted">
+                <li>Keep credentials safe</li>
+                <li>Report suspicious activity</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

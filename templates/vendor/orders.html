@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Vendor Orders{% endblock %}
+
+{% block content %}
+<h1 class="page-title"><i class="bi bi-truck"></i> Orders</h1>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Product</th>
+                    <th>Customer</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order_items %}
+                <tr>
+                    <td>#{{ item.order.id }}</td>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.order.first_name }} {{ item.order.last_name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ site_settings.currency }} {{ item.get_cost|intcomma }}</td>
+                    <td><span class="badge {% if item.order.status == 'delivered' %}bg-success{% elif item.order.status == 'cancelled' %}bg-danger{% else %}bg-warning{% endif %}">{{ item.order.get_status_display }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-muted text-center">No orders yet</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

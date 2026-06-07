@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms & Conditions - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card p-5 fade-in-up">
+            <h1 class="fw-bold mb-2">Terms & Conditions</h1>
+
+            <h4 class="fw-bold mt-4 mb-3">Acceptance</h4>
+            <p class="text-muted">By using MimicME Shop, you agree to all rules and policies.</p>
+
+            <h4 class="fw-bold mt-4 mb-3">Rules</h4>
+            <ul class="text-muted">
+                <li>No fraud or fake accounts</li>
+                <li>No illegal products</li>
+                <li>Respect platform users</li>
+            </ul>
+
+            <h4 class="fw-bold mt-4 mb-3">Admin Rights</h4>
+            <ul class="text-muted">
+                <li>Admin can manage all accounts and data</li>
+                <li>Admin may suspend or delete accounts</li>
+            </ul>
+
+            <h4 class="fw-bold mt-4 mb-3">Liability</h4>
+            <p class="text-muted">MimicME Shop is not responsible for:</p>
+            <ul class="text-muted">
+                <li>Third-party delivery delays</li>
+                <li>Vendor product quality issues (unless verified store)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

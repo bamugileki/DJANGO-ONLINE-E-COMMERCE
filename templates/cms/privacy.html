@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy Policy - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card p-5 fade-in-up">
+            <h1 class="fw-bold mb-2">Privacy Policy</h1>
+            <p class="text-muted mb-4">MimicME Shop respects user privacy and is committed to protecting personal data.</p>
+
+            <h4 class="fw-bold mt-4 mb-3">Data We Collect</h4>
+            <ul class="text-muted">
+                <li>Full name</li>
+                <li>Email address</li>
+                <li>Phone number</li>
+                <li>Address</li>
+                <li>Payment details (securely processed, not stored fully)</li>
+                <li>Order history</li>
+                <li>Device and usage data</li>
+            </ul>
+
+            <h4 class="fw-bold mt-4 mb-3">How We Use Data</h4>
+            <ul class="text-muted">
+                <li>Process orders</li>
+                <li>Improve services</li>
+                <li>Customer support</li>
+                <li>Security monitoring</li>
+                <li>Marketing (with consent)</li>
+            </ul>
+
+            <h4 class="fw-bold mt-4 mb-3">Data Protection</h4>
+            <ul class="text-muted">
+                <li>Encrypted storage</li>
+                <li>Secure authentication</li>
+                <li>Role-based access control</li>
+                <li>Audit logging</li>
+            </ul>
+
+            <h4 class="fw-bold mt-4 mb-3">User Rights</h4>
+            <ul class="text-muted">
+                <li>Access personal data</li>
+                <li>Update information</li>
+                <li>Request account deletion</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

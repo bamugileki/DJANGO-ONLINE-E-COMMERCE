@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Cancelled{% endblock %}
+
+{% block content %}
+    <div class="text-center py-5 fade-in-up">
+        <div class="mb-4" style="font-size:5rem; animation: float 3s ease-in-out infinite;">
+            <i class="bi bi-x-octagon-fill text-warning"></i>
+        </div>
+        <h1 class="display-4 fw-bold text-warning">Payment Cancelled</h1>
+        <p class="lead text-muted">Your payment was not processed. No charges have been made.</p>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <a href="{% url 'cart_detail' %}" class="btn btn-gradient">
+                <i class="bi bi-cart-fill"></i> Back to Cart
+            </a>
+            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-shop"></i> Continue Shopping
+            </a>
+        </div>
+    </div>
+{% endblock %}

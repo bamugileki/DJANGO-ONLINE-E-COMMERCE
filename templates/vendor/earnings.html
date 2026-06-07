@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Vendor Earnings{% endblock %}
+
+{% block content %}
+<h1 class="page-title"><i class="bi bi-cash-stack"></i> Earnings</h1>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card text-center p-4">
+            <h3 class="fw-bold" style="color:var(--primary);">{{ site_settings.currency }} {{ vendor.total_earnings|intcomma }}</h3>
+            <p class="text-muted mb-0">Total Earnings</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-4">
+            <h3 class="fw-bold" style="color:var(--accent);">{{ site_settings.currency }} {{ vendor.available_balance|intcomma }}</h3>
+            <p class="text-muted mb-0">Available Balance</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-4">
+            <h3 class="fw-bold" style="color:#e17055;">{{ withdrawals.count }}</h3>
+            <p class="text-muted mb-0">Withdrawals</p>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4 mb-4">
+    <h5 class="fw-bold mb-3">Request Withdrawal</h5>
+    <form method="post" action="{% url 'vendor_withdrawal_request' %}">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-4">
+                <input type="number" name="amount" step="0.01" class="form-control" placeholder="Amount" max="{{ vendor.available_balance }}" required>
+            </div>
+            <div class="col-md-4">
+                <select name="payment_method" class="form-select" required>
+                    <option value="">Select Method</option>
+                    <option value="mobile_money">Mobile Money</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="payment_details" class="form-control" placeholder="Account/Phone details" required>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-gradient"><i class="bi bi-send"></i> Request Withdrawal</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="card p-4">
+    <h5 class="fw-bold mb-3">Withdrawal History</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for w in withdrawals %}
+            <tr>
+                <td>{{ site_settings.currency }} {{ w.amount|intcomma }}</td>
+                <td>{{ w.get_payment_method_display }}</td>
+                <td><span class="badge {% if w.status == 'completed' %}bg-success{% elif w.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">{{ w.get_status_display }}</span></td>
+                <td>{{ w.created|date:"M d, Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-muted text-center">No withdrawals</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

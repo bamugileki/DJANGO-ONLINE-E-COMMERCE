@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Order History{% endblock %}
+
+{% block content %}
+    <h1 class="page-title"><i class="bi bi-box"></i> Order History</h1>
+
+    {% if orders %}
+        <div class="row g-4 fade-in-up">
+            {% for order in orders %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card card-product">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="fw-bold mb-1">Order #{{ order.id }}</h5>
+                                    <small class="text-muted"><i class="bi bi-calendar"></i> {{ order.created|date:"M j, Y" }}</small>
+                                </div>
+                                <div class="d-flex gap-1 flex-wrap justify-content-end">
+                                    {% if order.paid %}
+                                        <span class="badge order-status-paid"><i class="bi bi-check-circle"></i> Paid</span>
+                                    {% else %}
+                                        <span class="badge order-status-pending"><i class="bi bi-clock"></i> Pending</span>
+                                    {% endif %}
+                                    <span class="badge {% if order.status == 'delivered' %}order-status-paid{% elif order.status == 'cancelled' %}bg-danger{% else %}order-status-pending{% endif %}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Items</span>
+                                <span class="fw-semibold">{{ order.items.count }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Total</span>
+                                <span class="fw-bold" style="color:var(--primary);">{{ site_settings.currency }} {{ order.get_total_cost|intcomma }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Shipping to</span>
+                                <span class="fw-semibold text-truncate" style="max-width:150px;">{{ order.city }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state fade-in-up">
+            <div class="empty-icon">
+                <i class="bi bi-box-seam text-muted"></i>
+            </div>
+            <h3>No orders yet</h3>
+            <p class="text-muted">You haven't placed any orders yet.</p>
+            <a href="{% url 'product_list' %}" class="btn btn-gradient btn-lg">
+                <i class="bi bi-shop"></i> Start Shopping
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}

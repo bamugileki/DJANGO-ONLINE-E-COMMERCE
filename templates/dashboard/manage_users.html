@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #2d3436 100%);
+        border-radius: 20px;
+        padding: 25px 30px;
+        color: white;
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .page-header h1 {
+        font-weight: 800;
+        font-size: 1.6rem;
+        margin: 0;
+        background: none;
+        -webkit-text-fill-color: white;
+        background-clip: unset;
+    }
+    .page-header p {
+        margin: 3px 0 0;
+        opacity: 0.7;
+        font-size: 0.9rem;
+    }
+    .table-dashboard thead th {
+        border: none;
+        background: #f8f9fa;
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #636e72;
+        padding: 14px 18px;
+    }
+    .table-dashboard tbody td {
+        padding: 14px 18px;
+        border-color: #f0f0f0;
+        vertical-align: middle;
+    }
+    .table-dashboard tbody tr:hover {
+        background: #f8f7ff;
+    }
+    .table-dashboard tbody tr {
+        transition: background 0.3s;
+    }
+    .badge-role {
+        padding: 4px 16px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        display: inline-block;
+    }
+    .badge-role.admin { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; }
+    .badge-role.manager { background: linear-gradient(135deg, #00b894, #00cec9); color: white; }
+    .badge-role.vendor { background: linear-gradient(135deg, #fdcb6e, #e17055); color: white; }
+    .badge-role.customer { background: linear-gradient(135deg, #dfe6e9, #b2bec3); color: #2d3436; }
+    .badge-status {
+        padding: 4px 14px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+    .badge-status.active { background: #e8f5e9; color: #2e7d32; }
+    .badge-status.inactive { background: #ffebee; color: #c62828; }
+    .card-modern {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        overflow: hidden;
+    }
+    .user-avatar-initials {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+    .stat-summary {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+    .stat-summary .stat-item {
+        background: white;
+        border-radius: 12px;
+        padding: 15px 22px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+        border: 1px solid #f0f0f0;
+    }
+    .stat-summary .stat-item .num {
+        font-size: 1.5rem;
+        font-weight: 800;
+    }
+    .stat-summary .stat-item .label {
+        font-size: 0.75rem;
+        color: #636e72;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+</style>
+
+<div class="page-header fade-in-up">
+    <div>
+        <h1><i class="bi bi-people"></i> Manage Users</h1>
+        <p>All registered users on the platform</p>
+    </div>
+    <div>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-light btn-sm"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+    </div>
+</div>
+
+{% with admins=users|dictsortreversed:"date_joined" %}
+<div class="stat-summary fade-in-up">
+    <div class="stat-item">
+        <div class="num" style="color:#6c5ce7;">{{ users|length }}</div>
+        <div class="label">Total Users</div>
+    </div>
+    <div class="stat-item">
+        <div class="num" style="color:#00b894;">{{ users|dictsort:"is_active"|length }}</div>
+        <div class="label">Active</div>
+    </div>
+    <div class="stat-item">
+        <div class="num" style="color:#e17055;">{{ users|dictsort:"date_joined"|slice:":5"|length }}</div>
+        <div class="label">New This Month</div>
+    </div>
+</div>
+{% endwith %}
+
+<div class="card card-modern fade-in-up">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dashboard mb-0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="user-avatar-initials">{{ u.username|first|upper }}</span>
+                                <strong>{{ u.username }}</strong>
+                            </div>
+                        </td>
+                        <td><a href="mailto:{{ u.email }}" style="color:var(--primary);">{{ u.email }}</a></td>
+                        <td><span class="badge-role {{ u.profile.role }}">{{ u.profile.get_role_display }}</span></td>
+                        <td><span class="text-muted">{{ u.date_joined|date:"M d, Y" }}</span></td>
+                        <td>
+                            {% if u.is_active %}
+                            <span class="badge-status active"><i class="bi bi-check-circle"></i> Active</span>
+                            {% else %}
+                            <span class="badge-status inactive"><i class="bi bi-x-circle"></i> Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/admin/auth/user/{{ u.id }}/change/"  class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i> Edit</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

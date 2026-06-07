@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load dashboard_extras %}
+
+{% block title %}{{ meta.name }} - Admin{% endblock %}
+
+{% block content %}
+<style>
+    .admin-sidebar {
+        border-radius: 16px;
+        border: 1px solid #f0f0f0;
+        overflow: hidden;
+        position: sticky;
+        top: 90px;
+    }
+    .admin-sidebar .sidebar-header {
+        background: linear-gradient(135deg, #1a1a2e, #2d3436);
+        color: #fff;
+        padding: 16px 20px;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+    .admin-sidebar .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        text-decoration: none;
+        color: #2d3436;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+    }
+    .admin-sidebar .sidebar-item:hover {
+        background: #f8f7ff;
+        border-left-color: #6c5ce7;
+    }
+    .admin-sidebar .sidebar-item.active {
+        background: #f0edff;
+        border-left-color: #6c5ce7;
+        color: #6c5ce7;
+        font-weight: 600;
+    }
+    .admin-sidebar .app-group {
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .admin-sidebar .app-label {
+        padding: 10px 20px 4px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #b2bec3;
+        font-weight: 700;
+    }
+    .list-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        overflow: hidden;
+    }
+    .list-card .list-header {
+        background: linear-gradient(135deg, #1a1a2e, #2d3436);
+        color: #fff;
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .list-card .list-header h5 {
+        margin: 0;
+        font-weight: 700;
+    }
+    .table-crud {
+        margin: 0;
+    }
+    .table-crud thead th {
+        border: none;
+        background: #f8f9fa;
+        font-weight: 700;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #636e72;
+        padding: 12px 16px;
+    }
+    .table-crud tbody td {
+        padding: 12px 16px;
+        border-color: #f0f0f0;
+        vertical-align: middle;
+        font-size: 0.88rem;
+    }
+    .table-crud tbody tr:hover {
+        background: #f8f7ff;
+    }
+    .btn-crud {
+        padding: 4px 12px;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .btn-crud:hover {
+        transform: translateY(-1px);
+    }
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+        color: #b2bec3;
+    }
+    .empty-state i {
+        font-size: 3rem;
+        display: block;
+        margin-bottom: 15px;
+    }
+    .search-bar {
+        border: 2px solid #e8e8e8;
+        border-radius: 10px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        transition: all 0.3s;
+        width: 260px;
+    }
+    .search-bar:focus {
+        border-color: #6c5ce7;
+        box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
+        outline: none;
+    }
+</style>
+
+<div class="row g-4">
+    <div class="col-lg-3">
+        <div class="admin-sidebar">
+            <div class="sidebar-header"><i class="bi bi-grid"></i> Model Manager</div>
+            {% for app, models in apps_data.items %}
+            <div class="app-group">
+                <div class="app-label"><i class="{{ APP_ICONS|dict_key:app }}"></i> {{ app|title }}</div>
+                {% for m in models %}
+                <a href="{% url 'model_list' app_label=app model_name=m.model_name %}"
+                   class="sidebar-item {% if app_label == app and model_name == m.model_name %}active{% endif %}">
+                    <i class="{{ m.icon }}" style="width:18px;text-align:center;"></i> {{ m.name }}
+                </a>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        <div class="list-card">
+            <div class="list-header">
+                <h5><i class="{{ meta.icon }} me-2"></i> {{ meta.name }}</h5>
+                <div class="d-flex gap-2">
+                    <form method="GET" class="d-flex gap-2">
+                        <input type="text" name="q" class="search-bar" placeholder="Search..." value="{{ search_query }}">
+                        {% if search_query %}
+                        <a href="{% url 'model_list' app_label=app_label model_name=model_name %}" class="btn btn-outline-light btn-sm" style="border-radius:10px;">Clear</a>
+                        {% endif %}
+                    </form>
+                    <a href="{% url 'model_add' app_label=app_label model_name=model_name %}" class="btn btn-light btn-sm" style="border-radius:10px;font-weight:600;">
+                        <i class="bi bi-plus-lg"></i> Add
+                    </a>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-crud">
+                    <thead>
+                        <tr>
+                            {% for field in meta.fields %}
+                            <th>{{ field|title }}</th>
+                            {% endfor %}
+                            <th style="width:100px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obj in objects %}
+                        <tr>
+                            {% for field_name in meta.fields %}
+                            <td>
+                                {% with value=obj|lookup:field_name %}
+                                    {% if value is None %}
+                                        <span class="text-muted">—</span>
+                                    {% elif value is True %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% elif value is False %}
+                                        <span class="badge bg-danger">No</span>
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            {% endfor %}
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a href="{% url 'model_edit' app_label=app_label model_name=model_name pk=obj.pk %}" class="btn btn-sm btn-crud" style="background:#e8e5ff;color:#6c5ce7;" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'model_delete' app_label=app_label model_name=model_name pk=obj.pk %}" class="btn btn-sm btn-crud" style="background:#ffebee;color:#e17055;" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="{{ meta.fields|length|add:1 }}">
+                                <div class="empty-state">
+                                    <i class="bi bi-inbox"></i>
+                                    <p class="mb-0">No {{ meta.name|lower }} found.</p>
+                                    <a href="{% url 'model_add' app_label=app_label model_name=model_name %}" class="btn btn-sm mt-2" style="background:linear-gradient(135deg,#6c5ce7,#5a4bd1);color:#fff;border-radius:10px;font-weight:600;">
+                                        <i class="bi bi-plus-lg"></i> Create First
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
