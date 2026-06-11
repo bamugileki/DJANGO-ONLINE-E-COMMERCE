@@ -3,8 +3,23 @@ from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django.contrib import messages
 from cart.cart import Cart
 from orders.models import Order, OrderItem
+from cms.models import SiteSettings
+
+
+CURRENCY_MAP = {
+    'TSh': 'tzs',
+    'USD': 'usd',
+    'KES': 'kes',
+    'UGX': 'ugx',
+    'TZS': 'tzs',
+    'EUR': 'eur',
+    'GBP': 'gbp',
+}
+
+MINIMUM_CHARGE_CENTS = 50
 
 
 @login_required
@@ -14,6 +29,17 @@ def checkout_view(request):
         return redirect('product_list')
 
     if request.method == 'POST':
+        site_settings = SiteSettings.load()
+        currency = CURRENCY_MAP.get(site_settings.currency.upper(), 'usd')
+        total = cart.get_total_price()
+        total_cents = int(total * 100)
+        if total_cents < MINIMUM_CHARGE_CENTS:
+            messages.error(
+                request,
+                f'Your cart total of {site_settings.currency}{total:,.2f} is below the minimum of $0.50. Please add more items.',
+            )
+            return render(request, 'checkout/checkout.html', {'cart': cart})
+
         order = Order.objects.create(
             user=request.user,
             first_name=request.POST['first_name'],
@@ -37,7 +63,7 @@ def checkout_view(request):
                 payment_method_types=['card'],
                 line_items=[{
                     'price_data': {
-                        'currency': 'tzs',
+                        'currency': currency,
                         'product_data': {'name': item['product'].name},
                         'unit_amount': int(item['price'] * 100),
                     },

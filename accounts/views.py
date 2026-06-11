@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.urls import reverse
 from .forms import SignUpForm, ProfileEditForm
 
 
@@ -11,8 +12,8 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, 'Account created successfully!')
-            return redirect('product_list')
+            messages.success(request, 'Account created! Now enroll your face for secure authentication.')
+            return redirect(reverse('biometric_enrollment') + '?next=' + reverse('product_list'))
     else:
         form = SignUpForm()
     return render(request, 'accounts/signup.html', {'form': form})

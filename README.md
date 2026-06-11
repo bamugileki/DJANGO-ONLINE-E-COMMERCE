@@ -1,10 +1,10 @@
-# MimicME Shop
+# SmartTrade Africa limited
 
 A secure, multi-role e-commerce platform designed to support online buying and selling through both web and mobile applications.
 
 ## Project Overview
 
-MimicME Shop is a secure, multi-role e-commerce platform that consists of four main user roles: **Customer, Vendor, Manager, and Admin**, each with specific responsibilities and access levels within the platform.
+SmartTrade Africa limited is a secure, multi-role e-commerce platform that consists of four main user roles: **Customer, Vendor, Manager, and Admin**, each with specific responsibilities and access levels within the platform.
 
 The primary goal of the system is to address critical security and trust challenges commonly found in modern e-commerce environments. These challenges include:
 

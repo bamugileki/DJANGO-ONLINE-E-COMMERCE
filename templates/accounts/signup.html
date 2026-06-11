@@ -3,129 +3,715 @@
 {% block title %}Create Account{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center fade-in-up">
-    <div class="col-md-8 col-lg-7">
-        <div class="card-form">
-            <div class="text-center mb-4">
-                <div class="profile-avatar" style="width:70px;height:70px;font-size:2rem;">
-                    <i class="bi bi-person-plus"></i>
+<div class="position-relative">
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+        <div class="shape shape-5"></div>
+        <div class="shape shape-6"></div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="signup-card card-form">
+                <div class="text-center mb-4">
+                    <div class="signup-avatar">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </div>
+                    <h4 class="fw-bold mt-3 signup-title">Create Your Account</h4>
+                    <p class="signup-subtitle mb-0">
+                        <span class="typing-text"></span><span class="typing-cursor">|</span>
+                    </p>
                 </div>
-                <h4 class="fw-bold mt-3">Create Customer Account</h4>
-                <p class="text-muted">Join us and start shopping!</p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="section-group section-1">
+                        <h6 class="section-title"><i class="bi bi-person"></i> Personal Information</h6>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="input-group-anim">
+                                    <label class="form-label">First Name *</label>
+                                    <div class="input-wrapper">
+                                        {{ form.first_name }}
+                                        <div class="input-underline"></div>
+                                        <div class="input-icon"><i class="bi bi-person"></i></div>
+                                    </div>
+                                    {% if form.first_name.errors %}<div class="text-danger small mt-1 shake">{{ form.first_name.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group-anim">
+                                    <label class="form-label">Last Name *</label>
+                                    <div class="input-wrapper">
+                                        {{ form.last_name }}
+                                        <div class="input-underline"></div>
+                                        <div class="input-icon"><i class="bi bi-person"></i></div>
+                                    </div>
+                                    {% if form.last_name.errors %}<div class="text-danger small mt-1 shake">{{ form.last_name.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group-anim">
+                                    <label class="form-label">Email Address *</label>
+                                    <div class="input-wrapper">
+                                        {{ form.email }}
+                                        <div class="input-underline"></div>
+                                        <div class="input-icon"><i class="bi bi-envelope"></i></div>
+                                    </div>
+                                    {% if form.email.errors %}<div class="text-danger small mt-1 shake">{{ form.email.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group-anim">
+                                    <label class="form-label">Phone Number *</label>
+                                    <div class="input-wrapper">
+                                        {{ form.phone }}
+                                        <div class="input-underline"></div>
+                                        <div class="input-icon"><i class="bi bi-telephone"></i></div>
+                                    </div>
+                                    {% if form.phone.errors %}<div class="text-danger small mt-1 shake">{{ form.phone.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group-anim">
+                                    <label class="form-label">Username</label>
+                                    <div class="input-wrapper">
+                                        {{ form.username }}
+                                        <div class="input-underline"></div>
+                                        <div class="input-icon"><i class="bi bi-at"></i></div>
+                                    </div>
+                                    {% if form.username.errors %}<div class="text-danger small mt-1 shake">{{ form.username.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-group section-2">
+                        <h6 class="section-title"><i class="bi bi-lock"></i> Password</h6>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="input-group-anim">
+                                    <label class="form-label">Password *</label>
+                                    <div class="input-wrapper">
+                                        {{ form.password1 }}
+                                        <div class="input-underline"></div>
+                                        <div class="input-icon"><i class="bi bi-key"></i></div>
+                                    </div>
+                                    {% if form.password1.errors %}<div class="text-danger small mt-1 shake">{{ form.password1.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group-anim">
+                                    <label class="form-label">Confirm Password *</label>
+                                    <div class="input-wrapper">
+                                        {{ form.password2 }}
+                                        <div class="input-underline"></div>
+                                        <div class="input-icon"><i class="bi bi-key-fill"></i></div>
+                                    </div>
+                                    {% if form.password2.errors %}<div class="text-danger small mt-1 shake">{{ form.password2.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-group section-3">
+                        <h6 class="section-title"><i class="bi bi-geo-alt"></i> Address Information</h6>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-12">
+                                <div class="input-group-anim">
+                                    <label class="form-label">Street Address *</label>
+                                    <div class="input-wrapper">
+                                        {{ form.address_line1 }}
+                                        <div class="input-underline"></div>
+                                        <div class="input-icon"><i class="bi bi-house"></i></div>
+                                    </div>
+                                    {% if form.address_line1.errors %}<div class="text-danger small mt-1 shake">{{ form.address_line1.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group-anim">
+                                    <label class="form-label">City *</label>
+                                    <div class="input-wrapper">
+                                        {{ form.city }}
+                                        <div class="input-underline"></div>
+                                        <div class="input-icon"><i class="bi bi-building"></i></div>
+                                    </div>
+                                    {% if form.city.errors %}<div class="text-danger small mt-1 shake">{{ form.city.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group-anim">
+                                    <label class="form-label">Country *</label>
+                                    <div class="input-wrapper">
+                                        {{ form.country }}
+                                        <div class="input-underline"></div>
+                                        <div class="input-icon"><i class="bi bi-globe"></i></div>
+                                    </div>
+                                    {% if form.country.errors %}<div class="text-danger small mt-1 shake">{{ form.country.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group-anim">
+                                    <label class="form-label">Postal Code</label>
+                                    <div class="input-wrapper">
+                                        {{ form.postal_code }}
+                                        <div class="input-underline"></div>
+                                        <div class="input-icon"><i class="bi bi-mailbox"></i></div>
+                                    </div>
+                                    {% if form.postal_code.errors %}<div class="text-danger small mt-1 shake">{{ form.postal_code.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-group section-4">
+                        <h6 class="section-title"><i class="bi bi-check-circle"></i> Agreements</h6>
+                        <div class="mb-3 form-check input-group-anim">
+                            <div class="checkbox-wrapper">
+                                {{ form.accept_terms }}
+                                <label class="form-check-label" for="{{ form.accept_terms.id_for_label }}">
+                                    I accept the <a href="#" class="terms-link">Terms &amp; Conditions</a> and <a href="#" class="terms-link">Privacy Policy</a> *
+                                </label>
+                            </div>
+                            {% if form.accept_terms.errors %}<div class="text-danger small mt-1 shake">{{ form.accept_terms.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-gradient w-100 btn-lg btn-signup">
+                        <span class="btn-text"><i class="bi bi-person-check"></i> Create Account</span>
+                        <span class="btn-loader d-none">
+                            <span class="spinner-border spinner-border-sm me-2"></span>Creating account...
+                        </span>
+                    </button>
+                </form>
+
+                <div class="divider-animated my-4">
+                    <div class="divider-line"></div>
+                    <span class="divider-text"><i class="bi bi-dot"></i> ALREADY REGISTERED <i class="bi bi-dot"></i></span>
+                    <div class="divider-line"></div>
+                </div>
+
+                <div class="text-center login-prompt">
+                    <p class="mb-0">
+                        Have an account?
+                        <a href="{% url 'login' %}" class="login-link">
+                            Sign In <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </p>
+                </div>
             </div>
-            <form method="post">
-                {% csrf_token %}
-
-                <h6 class="fw-bold mb-3" style="color:var(--primary);"><i class="bi bi-person"></i> Personal Information</h6>
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">First Name *</label>
-                        {{ form.first_name }}
-                        {% if form.first_name.errors %}<div class="text-danger small">{{ form.first_name.errors }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Last Name *</label>
-                        {{ form.last_name }}
-                        {% if form.last_name.errors %}<div class="text-danger small">{{ form.last_name.errors }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Email Address *</label>
-                        {{ form.email }}
-                        {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Phone Number *</label>
-                        {{ form.phone }}
-                        {% if form.phone.errors %}<div class="text-danger small">{{ form.phone.errors }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Username</label>
-                        {{ form.username }}
-                        {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors }}</div>{% endif %}
-                    </div>
-                </div>
-
-                <h6 class="fw-bold mb-3 mt-4" style="color:var(--primary);"><i class="bi bi-lock"></i> Password</h6>
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Password *</label>
-                        {{ form.password1 }}
-                        {% if form.password1.errors %}<div class="text-danger small">{{ form.password1.errors }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Confirm Password *</label>
-                        {{ form.password2 }}
-                        {% if form.password2.errors %}<div class="text-danger small">{{ form.password2.errors }}</div>{% endif %}
-                    </div>
-                </div>
-
-                <h6 class="fw-bold mb-3 mt-4" style="color:var(--primary);"><i class="bi bi-geo-alt"></i> Address Information</h6>
-                <div class="row g-3 mb-3">
-                    <div class="col-md-12">
-                        <label class="form-label">Street Address *</label>
-                        {{ form.address_line1 }}
-                        {% if form.address_line1.errors %}<div class="text-danger small">{{ form.address_line1.errors }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">City *</label>
-                        {{ form.city }}
-                        {% if form.city.errors %}<div class="text-danger small">{{ form.city.errors }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Country *</label>
-                        {{ form.country }}
-                        {% if form.country.errors %}<div class="text-danger small">{{ form.country.errors }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Postal Code</label>
-                        {{ form.postal_code }}
-                        {% if form.postal_code.errors %}<div class="text-danger small">{{ form.postal_code.errors }}</div>{% endif %}
-                    </div>
-                </div>
-
-                <h6 class="fw-bold mb-3 mt-4" style="color:var(--primary);"><i class="bi bi-check-circle"></i> Agreements</h6>
-                <div class="mb-3 form-check">
-                    {{ form.accept_terms }}
-                    <label class="form-check-label" for="{{ form.accept_terms.id_for_label }}">
-                        I accept the <a href="#" class="fw-bold" style="color:var(--primary);">Terms &amp; Conditions</a> and <a href="#" class="fw-bold" style="color:var(--primary);">Privacy Policy</a> *
-                    </label>
-                    {% if form.accept_terms.errors %}<div class="text-danger small">{{ form.accept_terms.errors }}</div>{% endif %}
-                </div>
-
-                <button type="submit" class="btn btn-gradient w-100 btn-lg btn-sparkle">
-                    <i class="bi bi-person-check"></i> Create Account
-                </button>
-            </form>
-            <p class="text-center mt-3 mb-0">
-                Already have an account? <a href="{% url 'login' %}" class="fw-bold" style="color:var(--primary);">Login</a>
-            </p>
         </div>
     </div>
 </div>
 
 <style>
-    .card-form input, .card-form select, .card-form textarea {
-        border-radius: var(--radius-sm);
-        border: 2px solid #e8e8e8;
-        padding: 0.75rem 1rem;
-        transition: all 0.3s ease;
+    .signup-card {
+        animation: cardEntrance 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        position: relative;
+        overflow: hidden;
+        padding: 2.5rem 2rem;
+    }
+
+    .signup-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 30% 20%, rgba(108,92,231,0.03) 0%, transparent 50%);
+        animation: bgShift 8s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    @keyframes cardEntrance {
+        0% { opacity: 0; transform: scale(0.9) translateY(40px); }
+        100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes bgShift {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        33% { transform: translate(10px, -10px) rotate(1deg); }
+        66% { transform: translate(-10px, 5px) rotate(-1deg); }
+    }
+
+    .signup-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        background: linear-gradient(135deg, var(--primary), #a29bfe);
+        color: white;
+        animation: avatarPulse 3s ease-in-out infinite, avatarFloat 4s ease-in-out infinite;
+        box-shadow: 0 0 0 0 rgba(108,92,231,0.4);
+        position: relative;
+    }
+
+    .signup-avatar::after {
+        content: '';
+        position: absolute;
         width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid rgba(108,92,231,0.3);
+        animation: ringExpand 2s ease-out infinite;
     }
-    .card-form input:focus, .card-form select:focus {
+
+    @keyframes avatarPulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(108,92,231,0.4); }
+        50% { box-shadow: 0 0 0 20px rgba(108,92,231,0); }
+    }
+
+    @keyframes avatarFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+
+    @keyframes ringExpand {
+        0% { transform: scale(1); opacity: 0.6; }
+        100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    .signup-title {
+        background: linear-gradient(135deg, #2d3436, var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: titleFadeIn 0.8s ease forwards;
+        opacity: 0;
+    }
+
+    @keyframes titleFadeIn {
+        0% { opacity: 0; transform: translateY(-10px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .signup-subtitle {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        min-height: 1.5em;
+    }
+
+    .typing-cursor {
+        animation: blink 0.8s step-end infinite;
+        color: var(--primary);
+        font-weight: 700;
+    }
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
+
+    .section-group {
+        animation: sectionSlideIn 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    .section-1 { animation-delay: 0.15s; }
+    .section-2 { animation-delay: 0.3s; }
+    .section-3 { animation-delay: 0.45s; }
+    .section-4 { animation-delay: 0.6s; }
+
+    @keyframes sectionSlideIn {
+        0% { opacity: 0; transform: translateX(-20px); }
+        100% { opacity: 1; transform: translateX(0); }
+    }
+
+    .section-title {
+        font-weight: 700;
+        color: var(--primary);
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f0f0f0;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary), transparent);
+        animation: titleLine 1s ease forwards;
+    }
+
+    @keyframes titleLine {
+        0% { width: 0; }
+        100% { width: 60px; }
+    }
+
+    .input-group-anim {
+        animation: slideUp 0.5s ease forwards;
+        opacity: 0;
+    }
+
+    .section-1 .input-group-anim:nth-child(1) { animation-delay: 0.2s; }
+    .section-1 .input-group-anim:nth-child(2) { animation-delay: 0.25s; }
+    .section-1 .input-group-anim:nth-child(3) { animation-delay: 0.3s; }
+    .section-1 .input-group-anim:nth-child(4) { animation-delay: 0.35s; }
+    .section-1 .input-group-anim:nth-child(5) { animation-delay: 0.4s; }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper input, .input-wrapper select, .input-wrapper textarea {
+        border: 2px solid #e8e8e8;
+        border-radius: var(--radius-sm);
+        padding: 0.75rem 1rem 0.75rem 2.6rem;
+        width: 100%;
+        transition: all 0.3s ease;
+        background: #fafafa;
+        font-size: 0.95rem;
+    }
+
+    .input-wrapper input:focus, .input-wrapper select:focus, .input-wrapper textarea:focus {
         border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
+        box-shadow: 0 0 0 4px rgba(108,92,231,0.1);
+        background: white;
         outline: none;
+        transform: translateY(-1px);
     }
-    .card-form .form-check-input {
-        width: auto;
-        margin-right: 0.5rem;
+
+    .input-wrapper input:focus ~ .input-underline,
+    .input-wrapper select:focus ~ .input-underline,
+    .input-wrapper textarea:focus ~ .input-underline {
+        transform: scaleX(1);
     }
-    .card-form .errorlist {
-        list-style: none;
-        padding: 0;
-        margin: 0.25rem 0 0;
-        color: #dc3545;
-        font-size: 0.875rem;
+
+    .input-wrapper input:focus ~ .input-icon,
+    .input-wrapper select:focus ~ .input-icon,
+    .input-wrapper textarea:focus ~ .input-icon {
+        color: var(--primary);
+        transform: scale(1.1);
+    }
+
+    .input-underline {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary), #a29bfe);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+        border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #adb5bd;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        pointer-events: none;
+    }
+
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 1rem;
+        background: #f8f7ff;
+        border-radius: var(--radius-sm);
+        border: 2px solid #e8e5ff;
+        transition: all 0.3s ease;
+    }
+
+    .checkbox-wrapper:hover {
+        border-color: var(--primary);
+        background: #f0edff;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        accent-color: var(--primary);
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .terms-link {
+        color: var(--primary);
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .terms-link:hover {
+        text-decoration: underline;
+        color: var(--primary-dark);
+    }
+
+    .btn-signup {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-signup::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+    }
+
+    .btn-signup:active::after {
+        width: 300px;
+        height: 300px;
+    }
+
+    .btn-signup:hover {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 12px 35px rgba(108,92,231,0.5);
+    }
+
+    .btn-text { display: inline-flex; align-items: center; gap: 6px; }
+
+    .divider-animated {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: fadeIn 0.6s ease 0.7s forwards;
+        opacity: 0;
+    }
+
+    @keyframes fadeIn {
+        to { opacity: 1; }
+    }
+
+    .divider-line {
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
+        position: relative;
+    }
+
+    .divider-line::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        animation: shimmerLine 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmerLine {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    .divider-text {
+        color: var(--text-light);
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: nowrap;
+        animation: dividerPulse 2s ease-in-out infinite;
+        letter-spacing: 1px;
+    }
+
+    @keyframes dividerPulse {
+        0%, 100% { opacity: 0.6; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .login-prompt {
+        animation: slideUp 0.5s ease 0.8s forwards;
+        opacity: 0;
+    }
+
+    .login-link {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .login-link:hover {
+        gap: 8px;
+        color: var(--primary-dark);
+    }
+
+    .login-link i {
+        transition: transform 0.3s ease;
+    }
+
+    .login-link:hover i {
+        transform: translateX(4px);
+    }
+
+    .shake {
+        animation: shakeX 0.4s ease;
+    }
+
+    @keyframes shakeX {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-8px); }
+        40% { transform: translateX(8px); }
+        60% { transform: translateX(-5px); }
+        80% { transform: translateX(5px); }
+    }
+
+    .floating-shapes {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+    }
+
+    .shape {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.08;
+    }
+
+    .shape-1 {
+        width: 300px;
+        height: 300px;
+        background: var(--primary);
+        top: -50px;
+        right: -80px;
+        animation: shapeFloat1 12s ease-in-out infinite;
+    }
+
+    .shape-2 {
+        width: 200px;
+        height: 200px;
+        background: #fd79a8;
+        bottom: 10%;
+        left: -60px;
+        animation: shapeFloat2 10s ease-in-out infinite;
+    }
+
+    .shape-3 {
+        width: 150px;
+        height: 150px;
+        background: #00cec9;
+        top: 40%;
+        right: -30px;
+        animation: shapeFloat3 14s ease-in-out infinite;
+    }
+
+    .shape-4 {
+        width: 80px;
+        height: 80px;
+        background: #fdcb6e;
+        top: 20%;
+        left: 10%;
+        animation: shapeFloat1 8s ease-in-out infinite;
+    }
+
+    .shape-5 {
+        width: 120px;
+        height: 120px;
+        background: var(--primary);
+        bottom: 30%;
+        right: 15%;
+        animation: shapeFloat2 11s ease-in-out infinite;
+    }
+
+    .shape-6 {
+        width: 60px;
+        height: 60px;
+        background: #fd79a8;
+        top: 60%;
+        left: 5%;
+        animation: shapeFloat3 9s ease-in-out infinite;
+    }
+
+    @keyframes shapeFloat1 {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        25% { transform: translate(20px, -30px) rotate(90deg); }
+        50% { transform: translate(-10px, 20px) rotate(180deg); }
+        75% { transform: translate(30px, -10px) rotate(270deg); }
+    }
+
+    @keyframes shapeFloat2 {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(-20px, -20px) scale(1.1); }
+        66% { transform: translate(15px, 15px) scale(0.9); }
+    }
+
+    @keyframes shapeFloat3 {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(25px, -15px) rotate(180deg); }
+    }
+
+    @keyframes slideUp {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const subtitle = document.querySelector('.typing-text');
+        if (subtitle) {
+            const phrases = [
+                'Join us and start shopping!',
+                'Secure registration with biometrics',
+                'Your trusted e-commerce platform'
+            ];
+            let phraseIdx = 0;
+            let charIdx = 0;
+            let isDeleting = false;
+            let currentPhrase = phrases[phraseIdx];
+
+            function typeEffect() {
+                if (!subtitle) return;
+                currentPhrase = phrases[phraseIdx];
+                if (isDeleting) {
+                    subtitle.textContent = currentPhrase.substring(0, charIdx--);
+                } else {
+                    subtitle.textContent = currentPhrase.substring(0, charIdx++);
+                }
+
+                if (!isDeleting && charIdx === currentPhrase.length + 1) {
+                    isDeleting = true;
+                    setTimeout(typeEffect, 2000);
+                    return;
+                }
+                if (isDeleting && charIdx === 0) {
+                    isDeleting = false;
+                    phraseIdx = (phraseIdx + 1) % phrases.length;
+                    setTimeout(typeEffect, 500);
+                    return;
+                }
+                setTimeout(typeEffect, isDeleting ? 40 : 80);
+            }
+            typeEffect();
+        }
+    });
+</script>
 {% endblock %}

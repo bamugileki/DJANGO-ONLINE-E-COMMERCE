@@ -1,10 +1,10 @@
-# Secure E-Commerce Platform: MimicME Shop
+# Secure E-Commerce Platform: SmartTrade Africa limited
 
 ## Trust Management in E-Commerce (Course 428) — Group Project Report
 
 ---
 
-**Platform Name:** MimicME Shop  
+**Platform Name:** SmartTrade Africa limited  
 **Client:** SmartTrade Africa Ltd  
 **Course:** Trust Management in E-Commerce (428)  
 **Assignment Type:** Group Project  
@@ -132,9 +132,9 @@
 
 ## 1. Executive Summary
 
-SmartTrade Africa Ltd, a rapidly growing digital commerce company, identified critical trust and security challenges including fake customer accounts, online payment fraud, unauthorized access attempts, identity theft, and customer distrust toward online payments. To address these challenges, MimicME Shop was developed as a highly secure and trusted e-commerce platform.
+SmartTrade Africa Ltd, a rapidly growing digital commerce company, identified critical trust and security challenges including fake customer accounts, online payment fraud, unauthorized access attempts, identity theft, and customer distrust toward online payments. To address these challenges, SmartTrade Africa limited was developed as a highly secure and trusted e-commerce platform.
 
-This report documents the complete development lifecycle of the MimicME Shop platform, which integrates Trusted Computing Platform (TCP) concepts, facial biometric authentication, secure payment processing via Stripe API, trust management principles, and Technology Acceptance Model (TAM)/UTAUT frameworks. The platform is built using Django 5.2 with Bootstrap 5 frontend, incorporating state-of-the-art liveness detection using YOLO deep learning models and facial recognition using the dlib face_recognition library.
+This report documents the complete development lifecycle of the SmartTrade Africa limited platform, which integrates Trusted Computing Platform (TCP) concepts, facial biometric authentication, secure payment processing via Stripe API, trust management principles, and Technology Acceptance Model (TAM)/UTAUT frameworks. The platform is built using Django 5.2 with Bootstrap 5 frontend, incorporating state-of-the-art liveness detection using YOLO deep learning models and facial recognition using the dlib face_recognition library.
 
 Key achievements include the implementation of spoof-proof facial authentication with YOLO-based liveness detection, comprehensive role-based access control (admin, manager, vendor, customer), secure Stripe payment integration with Tanzanian Shilling (TZS) support, an eight-policy trust indicator framework, and a built-in TAM/UTAUT survey system for measuring technology acceptance.
 
@@ -155,7 +155,7 @@ SmartTrade Africa Ltd identified several critical challenges in their e-commerce
 
 ### 2.2 Objectives
 
-The development of MimicME Shop pursued eight primary objectives:
+The development of SmartTrade Africa limited pursued eight primary objectives:
 
 1. **Secure E-Commerce Platform:** Develop a robust, secure web application for online transactions
 2. **Trusted Computing Platform (TCP):** Integrate trusted computing mechanisms including secure session management, device trust verification, and secure token handling
@@ -971,9 +971,9 @@ A comprehensive technology acceptance survey measures user perceptions across TA
 **Perceived Usefulness (PU):**
 | Question | Field | Statement |
 |----------|-------|-----------|
-| PU1 | `pu_speeds_up` | Using MimicME Shop speeds up my shopping |
+| PU1 | `pu_speeds_up` | Using SmartTrade Africa limited speeds up my shopping |
 | PU2 | `pu_improves_performance` | The platform improves my shopping performance |
-| PU3 | `pu_useful` | I find MimicME Shop useful for shopping |
+| PU3 | `pu_useful` | I find SmartTrade Africa limited useful for shopping |
 
 **Perceived Ease of Use (PEOU):**
 | Question | Field | Statement |
@@ -1389,7 +1389,7 @@ python manage.py runsslserver
 
 ### 20.1 Achievement Summary
 
-The MimicME Shop platform successfully addresses SmartTrade Africa Ltd's trust and security challenges through:
+The SmartTrade Africa limited platform successfully addresses SmartTrade Africa Ltd's trust and security challenges through:
 
 1. **Multi-Factor Authentication:** Password + facial biometric with liveness detection
 2. **Secure Payments:** Stripe API integration with PCI DSS compliance
@@ -1692,7 +1692,7 @@ CREATE TABLE biometric_biometricsession (
 
 *End of Report*
 
-**Project:** MimicME Shop — Secure E-Commerce Platform  
+**Project:** SmartTrade Africa limited — Secure E-Commerce Platform  
 **Course:** Trust Management in E-Commerce (428)  
 **Client:** SmartTrade Africa Ltd  
 **Date:** June 2026

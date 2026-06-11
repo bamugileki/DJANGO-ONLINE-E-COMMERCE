@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             name='SiteSettings',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('site_name', models.CharField(default='MimicME Shop', max_length=200)),
+                ('site_name', models.CharField(default='SmartTrade Africa limited', max_length=200)),
                 ('site_tagline', models.CharField(blank=True, default='Your Premier E-Commerce Platform', max_length=500)),
                 ('logo', models.ImageField(blank=True, null=True, upload_to='site/')),
                 ('favicon', models.ImageField(blank=True, null=True, upload_to='site/')),

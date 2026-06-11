@@ -11,6 +11,11 @@
                 <i class="bi bi-camera"></i>
             </div>
             <h4 class="fw-bold">Face Enrollment</h4>
+            {% if next_url %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i> Face enrollment is required before you can proceed.
+                </div>
+            {% endif %}
             {% if has_face %}
                 <div class="alert alert-info">
                     <i class="bi bi-info-circle"></i> You already have a face enrolled. Capture again to update it.
@@ -44,9 +49,15 @@
                 </div>
             </div>
 
-            <a href="{% url 'profile' %}" class="text-decoration-none fw-bold" style="color:var(--primary);">
-                <i class="bi bi-arrow-left"></i> Back to Profile
-            </a>
+            {% if next_url %}
+                <a href="{{ next_url }}" class="text-decoration-none fw-bold d-none" id="skipLink" style="color:var(--primary);">
+                    <i class="bi bi-arrow-right"></i> Proceed to Home
+                </a>
+            {% else %}
+                <a href="{% url 'profile' %}" class="text-decoration-none fw-bold" style="color:var(--primary);">
+                    <i class="bi bi-arrow-left"></i> Back to Profile
+                </a>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -80,6 +91,7 @@
 
     let globalStream = null;
     const csrfToken = "{{ csrf_token }}";
+    const nextUrl = "{{ next_url|escapejs }}";
 
     function startCamera() {
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
@@ -149,6 +161,10 @@
                 statusIndicator.style.background = "#198754";
                 resultText.textContent = data.message || "Face enrolled successfully!";
                 resultText.className = "fw-semibold small text-success";
+                if (nextUrl) {
+                    resultText.textContent += " Redirecting...";
+                    setTimeout(() => { window.location.href = nextUrl; }, 1500);
+                }
             } else {
                 statusIndicator.style.background = "#dc3545";
                 resultText.textContent = data.message || "Enrollment Failed";

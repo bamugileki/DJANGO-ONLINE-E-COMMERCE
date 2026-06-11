@@ -1,7 +1,7 @@
 from django.db import models
 
 class SiteSettings(models.Model):
-    site_name = models.CharField(max_length=200, default='MimicME Shop')
+    site_name = models.CharField(max_length=200, default='SmartTrade Africa limited')
     site_tagline = models.CharField(max_length=500, blank=True, default='Your Premier E-Commerce Platform')
     logo = models.ImageField(upload_to='site/', blank=True, null=True)
     favicon = models.ImageField(upload_to='site/', blank=True, null=True)
