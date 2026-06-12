@@ -19,6 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import FaceDescriptor
 from cms.models import SiteSettings
+from activity.utils import log_activity
 
 User = get_user_model()
 
@@ -137,6 +138,7 @@ def verify_face_descriptor(request):
         if matches[0]:
             similarity = 1 - face_distance[0]
             request.session['face_verified'] = True
+            log_activity(request, 'login', description='Face verification for transaction')
             return JsonResponse({'status': 'ok', 'similarity': round(similarity, 4)})
         else:
             return JsonResponse({'status': 'error', 'message': 'Face does not match', 'similarity': round(1 - face_distance[0], 4)})
@@ -147,8 +149,8 @@ def verify_face_descriptor(request):
 def facial_login(request):
     if request.user.is_authenticated:
         return redirect('product_list')
-    settings = SiteSettings.load()
-    if not settings.facial_login_enabled:
+    site_settings = SiteSettings.load()
+    if site_settings.login_method not in ('both', 'face_only'):
         messages.error(request, 'Facial login is currently disabled by the administrator.')
         return redirect('login')
     return render(request, 'biometric/facial_login.html')
@@ -156,6 +158,9 @@ def facial_login(request):
 
 @csrf_exempt
 def facial_login_verify(request):
+    site_settings = SiteSettings.load()
+    if site_settings.login_method not in ('both', 'face_only'):
+        return JsonResponse({'status': 'error', 'message': 'Facial login is disabled by the administrator.'})
     if request.method != 'POST':
         return JsonResponse({'status': 'error', 'message': 'POST required'}, status=400)
     try:
@@ -175,6 +180,8 @@ def facial_login_verify(request):
                 user = desc.user
                 auth_login(request, user)
                 request.session['face_verified'] = True
+                request.session['login_method'] = 'face'
+                log_activity(request, 'login', description='Facial login')
                 return JsonResponse({
                     'status': 'ok',
                     'redirect': '/',

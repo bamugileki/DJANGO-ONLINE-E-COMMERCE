@@ -27,17 +27,22 @@
                 </div>
 
                 <div class="method-tabs">
-                    <button class="tab-btn active" data-tab="face">
+                    {% if site_settings.login_method == 'both' or site_settings.login_method == 'face_only' %}
+                    <button class="tab-btn {% if site_settings.login_method != 'password_only' %}active{% endif %}" data-tab="face">
                         <i class="bi bi-camera-fill"></i>
                         <span>Face Login</span>
                     </button>
-                    <button class="tab-btn" data-tab="password">
+                    {% endif %}
+                    {% if site_settings.login_method == 'both' or site_settings.login_method == 'password_only' %}
+                    <button class="tab-btn {% if site_settings.login_method == 'password_only' %}active{% endif %}" data-tab="password">
                         <i class="bi bi-key-fill"></i>
                         <span>Password</span>
                     </button>
+                    {% endif %}
                 </div>
 
-                <div class="tab-content active" id="tab-face">
+                {% if site_settings.login_method == 'both' or site_settings.login_method == 'face_only' %}
+                <div class="tab-content {% if site_settings.login_method != 'password_only' %}active{% endif %}" id="tab-face">
                     <div class="face-preview-wrap">
                         <div class="face-preview position-relative rounded-4 overflow-hidden border mx-auto" style="max-width:280px;aspect-ratio:4/3;background:#0f0f1a;">
                             <div id="placeholderDiv" class="d-flex align-items-center justify-content-center h-100 text-white-50">
@@ -68,8 +73,17 @@
                         <i class="bi bi-info-circle me-1"></i>Position your face within the oval frame
                     </p>
                 </div>
+                {% endif %}
 
-                <div class="tab-content" id="tab-password">
+                {% if site_settings.login_method == 'both' or site_settings.login_method == 'password_only' %}
+                <div class="tab-content {% if site_settings.login_method == 'password_only' %}active{% endif %}" id="tab-password">
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2 small shake" role="alert">
+                        {% for error in form.non_field_errors %}
+                        <i class="bi bi-exclamation-circle me-1"></i>{{ error }}<br>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                     <form method="post">
                         {% csrf_token %}
                         {% for field in form %}
@@ -113,6 +127,7 @@
                         <div class="hint-item"><i class="bi bi-fingerprint text-primary"></i> 2FA available</div>
                     </div>
                 </div>
+                {% endif %}
 
                 <div class="text-center mt-4 pt-3 border-top signup-prompt">
                     <p class="mb-0">

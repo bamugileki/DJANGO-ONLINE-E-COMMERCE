@@ -8,6 +8,7 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         ('Branding', {'fields': ('site_name', 'site_tagline', 'logo', 'favicon', 'footer_text')}),
         ('Contact', {'fields': ('contact_email', 'contact_phone', 'address')}),
         ('Shop Config', {'fields': ('currency', 'tax_rate', 'free_shipping_threshold', 'is_setup_complete')}),
+        ('Authentication', {'fields': ('login_method',), 'description': 'Choose which login methods users can use to access the platform.'}),
     )
 
     def has_add_permission(self, request):

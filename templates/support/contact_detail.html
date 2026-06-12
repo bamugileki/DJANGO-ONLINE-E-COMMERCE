@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ msg.subject }} - Contact{% endblock %}
+
+{% block content %}
+<style>
+    .detail-card { border: none; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; }
+    .detail-card .card-header-custom {
+        background: linear-gradient(135deg, #1a1a2e, #2d3436);
+        color: #fff; padding: 18px 24px;
+    }
+    .detail-card .card-body-custom { padding: 24px; }
+    .reply-card {
+        border: none; border-radius: 16px; background: #f8f9fa;
+        padding: 16px; margin-bottom: 12px;
+    }
+    .reply-card .reply-author { font-weight: 700; font-size: 0.9rem; }
+    .reply-card .reply-time { font-size: 0.75rem; color: #b2bec3; }
+    .reply-card .reply-body { margin-top: 8px; font-size: 0.9rem; }
+    .admin-reply { border-left: 3px solid #6c5ce7; background: #f8f7ff; }
+    .form-control {
+        border-radius: 12px; border: 2px solid #e8e8e8;
+        padding: 0.75rem 1rem; transition: all 0.3s ease;
+    }
+    .form-control:focus { border-color: #6c5ce7; box-shadow: 0 0 0 4px rgba(108,92,231,0.1); }
+    .badge-cat {
+        padding: 4px 14px; border-radius: 50px; font-size: 0.75rem; font-weight: 600;
+    }
+    .badge-cat.payment { background: #fff3e0; color: #e65100; }
+    .badge-cat.vendor { background: #e3f2fd; color: #1565c0; }
+    .badge-cat.technical { background: #f3e5f5; color: #7b1fa2; }
+</style>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="detail-card card mb-4">
+            <div class="card-header-custom d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-bold mb-1"><i class="bi bi-envelope-paper me-2"></i>{{ msg.subject }}</h5>
+                    <span class="badge-cat {{ msg.category }}">
+                        {% if msg.category == 'payment' %}Payment Issues
+                        {% elif msg.category == 'vendor' %}Vendor Support
+                        {% else %}Technical Support{% endif %}
+                    </span>
+                    <span class="badge {% if msg.status == 'open' %}bg-warning text-dark{% elif msg.status == 'in_progress' %}bg-info{% elif msg.status == 'resolved' %}bg-success{% else %}bg-secondary{% endif %} ms-2">
+                        {{ msg.get_status_display }}
+                    </span>
+                </div>
+                <a href="{% url 'support_contact_list' %}" class="btn btn-light btn-sm" style="border-radius:10px;font-weight:600;">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+            <div class="card-body-custom">
+                <div class="mb-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">From</small>
+                            <div class="fw-bold">{{ msg.full_name }}</div>
+                            <div class="small">{{ msg.email }}</div>
+                            {% if msg.phone %}<div class="small">{{ msg.phone }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <small class="text-muted">Submitted</small>
+                            <div class="fw-bold">{{ msg.created|date:"F d, Y" }}</div>
+                            <div class="small">{{ msg.created|time:"H:i" }}</div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="mb-0">
+                    <small class="text-muted">Message</small>
+                    <p class="mt-2 mb-0" style="white-space:pre-wrap;">{{ msg.message }}</p>
+                </div>
+                {% if msg.attachment %}
+                <hr>
+                <div>
+                    <small class="text-muted">Attachment</small>
+                    <div class="mt-1">
+                        <a href="{{ msg.attachment.url }}" class="btn btn-sm" style="background:#e8e5ff;color:#6c5ce7;border-radius:10px;font-weight:600;" target="_blank">
+                            <i class="bi bi-paperclip"></i> View Attachment
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="detail-card card">
+            <div class="card-header-custom">
+                <h5 class="fw-bold mb-0"><i class="bi bi-chat-dots me-2"></i>Replies ({{ msg.replies.count }})</h5>
+            </div>
+            <div class="card-body-custom">
+                {% for reply in msg.replies.all %}
+                <div class="reply-card {% if reply.user.profile.role in 'admin,manager' or reply.user.is_superuser %}admin-reply{% endif %}">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <span class="reply-author">{{ reply.user.get_full_name|default:reply.user.username }}</span>
+                            {% if reply.user.profile.role == 'admin' or reply.user.is_superuser %}
+                                <span class="badge bg-danger ms-1" style="font-size:0.6rem;">Admin</span>
+                            {% elif reply.user.profile.role == 'manager' %}
+                                <span class="badge bg-info ms-1" style="font-size:0.6rem;">Manager</span>
+                            {% elif reply.user.profile.role == 'vendor' %}
+                                <span class="badge bg-primary ms-1" style="font-size:0.6rem;">Vendor</span>
+                            {% endif %}
+                        </div>
+                        <span class="reply-time">{{ reply.created|timesince }} ago</span>
+                    </div>
+                    <div class="reply-body">{{ reply.message|linebreaks }}</div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center mb-0 py-3">No replies yet.</p>
+                {% endfor %}
+
+                <hr class="my-4">
+                <h6 class="fw-bold mb-3"><i class="bi bi-reply me-2"></i>Write a Reply</h6>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <textarea name="message" class="form-control" rows="4" placeholder="Type your reply..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;border-radius:12px;font-weight:700;padding:0.65rem 2rem;">
+                        <i class="bi bi-send me-2"></i>Send Reply
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="detail-card card">
+            <div class="card-header-custom">
+                <h6 class="fw-bold mb-0"><i class="bi bi-info-circle me-2"></i>Details</h6>
+            </div>
+            <div class="card-body-custom">
+                <div class="mb-3">
+                    <small class="text-muted">Category</small>
+                    <div class="fw-bold">
+                        {% if msg.category == 'payment' %}Payment Issues
+                        {% elif msg.category == 'vendor' %}Vendor Support
+                        {% else %}Technical Support{% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Status</small>
+                    <div class="fw-bold">{{ msg.get_status_display }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Contact</small>
+                    <div class="fw-bold">{{ msg.full_name }}</div>
+                    <div>{{ msg.email }}</div>
+                    {% if msg.phone %}<div>{{ msg.phone }}</div>{% endif %}
+                </div>
+                <div>
+                    <small class="text-muted">Submitted</small>
+                    <div class="fw-bold">{{ msg.created|date:"M d, Y" }}</div>
+                    <div>{{ msg.created|time:"H:i" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -3,124 +3,143 @@
 {% block title %}Contact Us - {{ site_settings.site_name }}{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-10">
-        <div class="card p-5 fade-in-up">
-            <h1 class="fw-bold mb-2">Contact Us</h1>
-            <p class="text-muted mb-4 fs-5">We're Here to Help</p>
-            <p>At SmartTrade Africa limited, we value our customers, vendors, and partners. If you have any questions, issues, or feedback, feel free to reach out to us anytime. Our support team is ready to assist you.</p>
+<style>
+    .contact-card { border: none; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; }
+    .contact-card .card-header-custom {
+        background: linear-gradient(135deg, #1a1a2e, #2d3436);
+        color: #fff; padding: 20px 28px;
+    }
+    .contact-card .card-body-custom { padding: 28px; }
+    .info-card {
+        border: none; border-radius: 16px; transition: all 0.3s ease;
+        padding: 20px; height: 100%; background: #f8f9fa;
+    }
+    .info-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+    .info-card .info-icon {
+        width: 44px; height: 44px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.3rem; margin-bottom: 12px;
+    }
+    .form-control, .form-select {
+        border-radius: 10px; border: 2px solid #e8e8e8;
+        padding: 0.65rem 1rem; transition: all 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #6c5ce7; box-shadow: 0 0 0 4px rgba(108,92,231,0.1);
+    }
+    .form-label { font-weight: 600; font-size: 0.85rem; color: #2d3436; }
+    .submit-btn {
+        background: linear-gradient(135deg, #6c5ce7, #a29bfe); border: none;
+        border-radius: 12px; padding: 0.75rem 2rem; font-weight: 700;
+        transition: all 0.3s ease;
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(108,92,231,0.4); }
+</style>
 
-            <hr class="my-4">
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="contact-card card">
+            <div class="card-header-custom">
+                <h4 class="fw-bold mb-1"><i class="bi bi-envelope-paper me-2"></i>Send Us a Message</h4>
+                <p class="mb-0 opacity-75 small">Fill out the form and we'll get back to you within 24 hours.</p>
+            </div>
+            <div class="card-body-custom">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
 
-            <h4 class="fw-bold mb-3">Get in Touch</h4>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        {{ form.category }}
+                    </div>
 
-            <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <div class="card h-100 p-4">
-                        <h5 class="fw-bold">Email Support</h5>
-                        <p class="mb-1">support@mimicmeshop.com</p>
-                        <p class="mb-0">info@mimicmeshop.com</p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                            {{ form.full_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                            {{ form.email }}
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100 p-4">
-                        <h5 class="fw-bold">Phone Support</h5>
-                        <p class="mb-1">Customer Care: +255689045666</p>
-                        <p class="mb-0">Technical Support: +255689045666</p>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number <span class="text-muted">(optional)</span></label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Subject <span class="text-danger">*</span></label>
+                            {{ form.subject }}
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100 p-4">
-                        <h5 class="fw-bold">Location</h5>
-                        <p class="mb-1">Dar es Salaam, Tanzania</p>
-                        <p class="mb-0">SmartTrade Africa limited Headquarters</p>
+
+                    <div class="mb-3 mt-3">
+                        <label class="form-label">Message <span class="text-danger">*</span></label>
+                        {{ form.message }}
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100 p-4">
-                        <h5 class="fw-bold">Working Hours</h5>
-                        <p class="mb-1">Monday - Friday: 08:00 AM - 06:00 PM</p>
-                        <p class="mb-1">Saturday: 09:00 AM - 02:00 PM</p>
-                        <p class="mb-0">Sunday: Closed (Emergency support only)</p>
+
+                    <div class="mb-4">
+                        <label class="form-label">Attach File <span class="text-muted">(optional)</span></label>
+                        {{ form.attachment }}
+                    </div>
+
+                    <button type="submit" class="btn submit-btn text-white w-100">
+                        <i class="bi bi-send me-2"></i>Submit Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="contact-card card mb-4">
+            <div class="card-header-custom">
+                <h5 class="fw-bold mb-0"><i class="bi bi-info-circle me-2"></i>Contact Information</h5>
+            </div>
+            <div class="card-body-custom">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="info-card">
+                            <div class="info-icon" style="background:#e8e5ff;color:#6c5ce7;"><i class="bi bi-envelope"></i></div>
+                            <h6 class="fw-bold">Email Support</h6>
+                            <p class="mb-0 text-muted small">support@mimicmeshop.com<br>info@mimicmeshop.com</p>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="info-card">
+                            <div class="info-icon" style="background:#ffe8e0;color:#e17055;"><i class="bi bi-telephone"></i></div>
+                            <h6 class="fw-bold">Phone Support</h6>
+                            <p class="mb-0 text-muted small">+255689045666</p>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="info-card">
+                            <div class="info-icon" style="background:#e0f7e8;color:#00b894;"><i class="bi bi-geo-alt"></i></div>
+                            <h6 class="fw-bold">Location</h6>
+                            <p class="mb-0 text-muted small">Dar es Salaam, Tanzania</p>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="info-card">
+                            <div class="info-icon" style="background:#fff3e0;color:#fdcb6e;"><i class="bi bi-clock"></i></div>
+                            <h6 class="fw-bold">Working Hours</h6>
+                            <p class="mb-0 text-muted small">Mon-Fri: 08:00 - 18:00<br>Sat: 09:00 - 14:00</p>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <h4 class="fw-bold mb-3">Support Categories</h4>
-
-            <div class="row g-4 mb-4">
-                <div class="col-md-4">
-                    <div class="card h-100 p-4">
-                        <h5 class="fw-bold">Customer Support</h5>
-                        <ul class="list-unstyled mb-0 text-muted">
-                            <li>Order issues</li>
-                            <li>Refund requests</li>
-                            <li>Account problems</li>
-                            <li>Payment issues</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 p-4">
-                        <h5 class="fw-bold">Vendor Support</h5>
-                        <ul class="list-unstyled mb-0 text-muted">
-                            <li>Product approval</li>
-                            <li>Store management</li>
-                            <li>Payout issues</li>
-                            <li>Commission inquiries</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 p-4">
-                        <h5 class="fw-bold">Technical Support</h5>
-                        <ul class="list-unstyled mb-0 text-muted">
-                            <li>Login problems</li>
-                            <li>System bugs</li>
-                            <li>API issues</li>
-                            <li>Security concerns</li>
-                        </ul>
-                    </div>
-                </div>
+        <div class="contact-card card">
+            <div class="card-header-custom" style="background:linear-gradient(135deg,#e17055,#fd79a8);">
+                <h5 class="fw-bold mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Emergency Support</h5>
             </div>
-
-            <h4 class="fw-bold mb-3">Contact Form (Recommended Fields)</h4>
-            <p class="text-muted mb-3">If you want to build a form in your system, include:</p>
-            <div class="row">
-                <div class="col-md-6">
-                    <ul class="list-unstyled text-muted">
-                        <li>Full Name</li>
-                        <li>Email Address</li>
-                        <li>Phone Number (optional)</li>
-                        <li>User Role (Customer / Vendor / Manager)</li>
-                    </ul>
-                </div>
-                <div class="col-md-6">
-                    <ul class="list-unstyled text-muted">
-                        <li>Subject</li>
-                        <li>Message</li>
-                        <li>Attach File (optional)</li>
-                    </ul>
-                </div>
+            <div class="card-body-custom">
+                <p class="small text-muted mb-2">For urgent issues like payment failure, account hacking, or fraud:</p>
+                <p class="mb-1 fw-bold">emergency@mimicmeshop.com</p>
+                <p class="fw-bold">Hotline: +255689045666</p>
             </div>
-
-            <hr class="my-4">
-
-            <h4 class="fw-bold mb-3">Emergency Support</h4>
-            <p class="text-muted">For urgent issues like:</p>
-            <ul class="text-muted mb-3">
-                <li>Payment failure</li>
-                <li>Account hacking</li>
-                <li>Fraud activity</li>
-            </ul>
-            <p>Contact us immediately:</p>
-            <p class="mb-1">emergency@mimicmeshop.com</p>
-            <p>Hotline: +255689045666</p>
-
-            <hr class="my-4">
-
-            <h4 class="fw-bold mb-3">Our Commitment</h4>
-            <p class="text-muted">We aim to respond to all inquiries within 24 hours and resolve technical issues as quickly as possible.</p>
         </div>
     </div>
 </div>

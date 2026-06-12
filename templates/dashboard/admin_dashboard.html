@@ -267,9 +267,17 @@
                 <a href="{% url 'manage_employees' %}"><i class="bi bi-person-badge"></i> Employees</a>
                 <a href="{% url 'model_list' app_label='cms' model_name='sitesettings' %}">
                     <i class="bi bi-gear"></i> Site Settings
-                    {% if not site_settings.facial_login_enabled %}
-                    <span class="badge bg-warning ms-1">Face Auth OFF</span>
+                    {% if site_settings.login_method == 'password_only' %}
+                    <span class="badge bg-warning ms-1">Password Only</span>
+                    {% elif site_settings.login_method == 'face_only' %}
+                    <span class="badge bg-info ms-1">Face Only</span>
                     {% endif %}
+                </a>
+                <a href="{% url 'model_list' app_label='activity' model_name='activitylog' %}">
+                    <i class="bi bi-activity"></i> Activity Logs
+                </a>
+                <a href="{% url 'support_contact_list' %}">
+                    <i class="bi bi-envelope-paper"></i> Contact Messages
                 </a>
             </div>
         </div>

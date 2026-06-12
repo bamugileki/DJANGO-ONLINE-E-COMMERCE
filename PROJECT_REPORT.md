@@ -527,14 +527,35 @@ checkout_session = stripe.checkout.Session.create(
 
 ### 6.2 Payment Flow
 
+The checkout process enforces biometric verification based on login method:
+
 ```
-1. Cart → Checkout Form (shipping details)
-2. Order + OrderItems created in database
-3. Stripe Checkout Session created with line items
-4. User redirected to Stripe-hosted payment page
-5. Payment processed by Stripe (sandbox)
-6. Success: Order marked as paid, cart cleared
-7. Cancel: Order preserved, user returned to cart
+1. Cart → Checkout
+2. Login Method Check:
+   ├─ Face Login → Skip verification (already trusted)
+   └─ Password Login → Face verification required
+3. Checkout Form (shipping details)
+4. Order + OrderItems created in database
+5. Stripe Checkout Session created with line items
+6. User redirected to Stripe-hosted payment page
+7. Payment processed by Stripe (sandbox)
+8. Success: Order marked as paid, cart cleared
+9. Cancel: Order preserved, user returned to cart
+```
+
+**Login Method Logic:**
+- **Face Login:** `login_method = 'face'` and `face_verified = True` set on login. Face-authenticated users skip re-verification for all transactions during the session.
+- **Password Login:** `login_method = 'password'` set on login. `face_verified` is absent, so users must complete a face scan before each payment.
+- After a successful transaction, `face_verified` is reset to `False` only for password-logged-in users, ensuring each new transaction requires fresh biometric verification.
+- The `login_method` session variable persists for the entire session lifetime, ensuring consistent authentication enforcement.
+
+**Implementation:**
+```python
+# checkout/views.py
+login_method = request.session.get('login_method', '')
+if login_method != 'face' and not request.session.get('face_verified'):
+    messages.warning(request, 'Please verify your face to complete payment.')
+    return redirect(f'{reverse("biometric_verify")}?next={reverse("checkout")}')
 ```
 
 ### 6.3 Transaction Recording
@@ -750,7 +771,13 @@ The platform implements multiple layers of anti-spoofing protection:
 - Users can re-enroll to update their biometric data
 - Admin can disable suspicious enrollments
 
-**Layer 4: Session-Based Verification**
+**Layer 4: Login Method Tracking**
+- `login_method` session variable tracks authentication origin (`'face'` or `'password'`)
+- Face-authenticated users skip re-verification throughout the session
+- Password users must verify face before each transaction
+- `face_verified` is reset after payment only for password-logged-in users
+
+**Layer 5: Session-Based Verification**
 - `face_verified` session key set only after successful biometric match
 - Session expires after inactivity (14-day timeout)
 - Verification status is server-side (cannot be tampered with)
@@ -900,15 +927,22 @@ class ActivityLog(models.Model):
 **Logged Events:**
 | Event Type | Description | Data Captured |
 |------------|-------------|---------------|
-| Login | User authentication | User, IP, timestamp |
+| Login (Password) | Password-based authentication | User, IP, timestamp, login_method |
+| Login (Face) | Facial recognition authentication | User, IP, timestamp, login_method |
+| Face Verification | Transaction-time biometric check | User, IP, timestamp |
 | Logout | Session termination | User, timestamp |
 | Registration | New account created | User details |
-| Order Create | New order placed | Order ID, items, amount |
-| Payment | Payment processed | Transaction ID, amount, method |
+| Payment | Payment processed | Order ID, amount, method |
 | Product Edit | Product modification | Product ID, changes |
 | Profile Update | User profile change | Changed fields |
 | Face Enrollment | Biometric registration | User, timestamp |
-| Vendor Apply | Vendor application | Vendor ID, business name |
+| Dashboard Actions | CRUD operations in admin | User, action, model, object |
+
+**Logging Middleware:**
+The platform uses an `ActivityLogMiddleware` that automatically captures all POST/PUT/DELETE requests made through the admin dashboard, ensuring comprehensive audit coverage without manual logging in every view.
+
+**Admin View:**
+Activity logs are fully viewable through the dashboard at **Dashboard → Activity Logs**, with search, filter by action type, and sort by timestamp. Admin/Manager roles have read-only access to the complete audit trail.
 
 ### 10.7 Input Validation and Sanitization
 

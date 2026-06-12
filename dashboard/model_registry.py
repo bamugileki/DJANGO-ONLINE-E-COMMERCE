@@ -103,6 +103,14 @@ MODEL_REGISTRY = {
         'name': 'Ticket Replies', 'icon': 'bi-chat',
         'fields': ('ticket', 'user', 'created'),
     },
+    'support.contactmessage': {
+        'name': 'Contact Messages', 'icon': 'bi-envelope-paper',
+        'fields': ('full_name', 'email', 'category', 'subject', 'status', 'created'),
+    },
+    'support.contactreply': {
+        'name': 'Contact Replies', 'icon': 'bi-reply',
+        'fields': ('contact', 'user', 'created'),
+    },
     'activity.activitylog': {
         'name': 'Activity Log', 'icon': 'bi-activity',
         'fields': ('user', 'action', 'model_name', 'created'),

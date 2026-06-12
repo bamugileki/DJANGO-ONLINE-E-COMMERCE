@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.http import Http404
+from support.views import contact_view
 
 
 def contact(request):
-    return render(request, 'cms/contact.html')
+    return contact_view(request)
 
 
 POLICY_TEMPLATES = {

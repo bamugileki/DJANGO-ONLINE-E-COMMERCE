@@ -1,6 +1,19 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+
+
+class LoginForm(AuthenticationForm):
+    error_messages = {
+        'invalid_login': "Please enter a correct username and password.",
+        'inactive': "This account is inactive.",
+    }
+
+    def get_invalid_login_error(self):
+        return forms.ValidationError(
+            self.error_messages['invalid_login'],
+            code='invalid_login',
+        )
 
 
 class SignUpForm(UserCreationForm):

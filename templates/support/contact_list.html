@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Messages - Admin{% endblock %}
+
+{% block content %}
+<style>
+    .msg-card { border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; }
+    .msg-card .card-header-custom {
+        background: linear-gradient(135deg, #1a1a2e, #2d3436);
+        color: #fff; padding: 18px 24px;
+    }
+    .msg-card .card-body-custom { padding: 0; }
+    .table-msg { margin: 0; }
+    .table-msg thead th {
+        border: none; background: #f8f9fa; font-weight: 700;
+        font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px;
+        color: #636e72; padding: 12px 16px;
+    }
+    .table-msg tbody td {
+        padding: 14px 16px; border-color: #f0f0f0; vertical-align: middle;
+        font-size: 0.88rem;
+    }
+    .table-msg tbody tr:hover { background: #f8f7ff; }
+    .table-msg tbody tr.unread { background: #f0edff; font-weight: 600; }
+    .badge-cat {
+        padding: 4px 12px; border-radius: 50px; font-size: 0.72rem; font-weight: 600;
+    }
+    .badge-cat.payment { background: #fff3e0; color: #e65100; }
+    .badge-cat.vendor { background: #e3f2fd; color: #1565c0; }
+    .badge-cat.technical { background: #f3e5f5; color: #7b1fa2; }
+    .empty-state { padding: 60px 20px; text-align: center; color: #b2bec3; }
+    .empty-state i { font-size: 3rem; display: block; margin-bottom: 15px; }
+</style>
+
+<div class="msg-card card">
+    <div class="card-header-custom">
+        <h5 class="fw-bold mb-0"><i class="bi bi-envelope-paper me-2"></i>Contact Messages</h5>
+    </div>
+    <div class="card-body-custom">
+        <div class="table-responsive">
+            <table class="table table-msg">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>From</th>
+                        <th>Category</th>
+                        <th>Subject</th>
+                        <th>Date</th>
+                        <th>Replies</th>
+                        <th style="width:80px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in messages_list %}
+                    <tr class="{% if not m.is_read %}unread{% endif %}">
+                        <td>
+                            {% if m.status == 'open' %}
+                                <span class="badge bg-warning text-dark">Open</span>
+                            {% elif m.status == 'in_progress' %}
+                                <span class="badge bg-info">In Progress</span>
+                            {% elif m.status == 'resolved' %}
+                                <span class="badge bg-success">Resolved</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Closed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="fw-semibold">{{ m.full_name }}</div>
+                            <small class="text-muted">{{ m.email }}</small>
+                        </td>
+                        <td>
+                            <span class="badge-cat {{ m.category }}">
+                                {% if m.category == 'payment' %}Payment Issues
+                                {% elif m.category == 'vendor' %}Vendor Support
+                                {% else %}Technical Support{% endif %}
+                            </span>
+                        </td>
+                        <td>{{ m.subject|truncatechars:40 }}</td>
+                        <td><small class="text-muted">{{ m.created|date:"M d, Y" }}</small></td>
+                        <td><span class="badge bg-secondary">{{ m.replies.count }}</span></td>
+                        <td>
+                            <a href="{% url 'support_contact_detail' pk=m.pk %}" class="btn btn-sm" style="background:#e8e5ff;color:#6c5ce7;border-radius:8px;font-weight:600;">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <p class="mb-0">No contact messages yet.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

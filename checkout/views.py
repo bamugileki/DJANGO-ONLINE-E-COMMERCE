@@ -7,6 +7,7 @@ from django.contrib import messages
 from cart.cart import Cart
 from orders.models import Order, OrderItem
 from cms.models import SiteSettings
+from activity.utils import log_activity
 
 
 CURRENCY_MAP = {
@@ -27,6 +28,11 @@ def checkout_view(request):
     cart = Cart(request)
     if len(cart) == 0:
         return redirect('product_list')
+
+    login_method = request.session.get('login_method', '')
+    if login_method != 'face' and not request.session.get('face_verified'):
+        messages.warning(request, 'Please verify your face to complete payment.')
+        return redirect(f'{reverse("biometric_verify")}?next={reverse("checkout")}')
 
     if request.method == 'POST':
         site_settings = SiteSettings.load()
@@ -93,6 +99,10 @@ def checkout_success(request, order_id):
     cart.clear()
     order.paid = True
     order.save()
+    log_activity(request, 'payment', model_name='Order', object_id=order.id, description=f'Order #{order.id} paid via Stripe')
+    login_method = request.session.get('login_method', '')
+    if login_method != 'face':
+        request.session['face_verified'] = False
     return render(request, 'checkout/success.html', {'order': order})
 
 

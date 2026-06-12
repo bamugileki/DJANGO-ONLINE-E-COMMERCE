@@ -12,6 +12,7 @@ urlpatterns = [
     path('orders/', include('orders.urls')),
     path('vendor/', include('vendor.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('support/', include('support.urls')),
     path('biometric/', include('biometric.urls')),
     path('survey/', include('surveys.urls')),
     path('contact/', cms_views.contact, name='contact'),
