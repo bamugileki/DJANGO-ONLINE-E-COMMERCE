@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Receipt #{{ order.id }}{% endblock %}
+
+{% block content %}
+<style>
+  @media print {
+    .navbar, .site-footer, .no-print { display: none !important; }
+    body { padding-top: 0 !important; }
+    .receipt-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+    .page-content { margin-top: 0 !important; }
+  }
+  .receipt-card {
+    max-width: 800px; margin: 0 auto;
+    border-radius: 16px; border: none;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  .receipt-header {
+    border-bottom: 2px dashed #e9ecef;
+    text-align: center; padding-bottom: 1.5rem;
+  }
+  .receipt-table th { background: #f8f9fa; font-weight: 600; }
+  .receipt-total-row { font-size: 1.1rem; }
+  .receipt-total-row td { border-top: 2px solid #dee2e6; }
+</style>
+
+<div class="fade-in-up">
+  <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+    <h1 class="page-title mb-0"><i class="bi bi-receipt"></i> Receipt</h1>
+    <button class="btn btn-gradient" onclick="window.print()">
+      <i class="bi bi-download"></i> Download / Print
+    </button>
+  </div>
+
+  <div class="card receipt-card">
+    <div class="card-body p-4 p-md-5">
+      <div class="receipt-header mb-4">
+        <h2 class="fw-bold" style="color:var(--primary);">{{ site_settings.site_name }}</h2>
+        <p class="mb-1 text-muted">{{ site_settings.address }}</p>
+        <p class="mb-0 text-muted">{{ site_settings.contact_email }} | {{ site_settings.contact_phone }}</p>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-sm-6">
+          <small class="text-muted text-uppercase fw-bold">Bill To</small>
+          <p class="mb-0 fw-semibold">{{ order.first_name }} {{ order.last_name }}</p>
+          <p class="mb-0 text-muted">{{ order.address }}</p>
+          <p class="mb-0 text-muted">{{ order.city }} {{ order.postal_code }}</p>
+          <p class="mb-0 text-muted">{{ order.email }}</p>
+        </div>
+        <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+          <small class="text-muted text-uppercase fw-bold">Receipt #{{ order.id }}</small>
+          <p class="mb-0 fw-semibold">{{ order.created|date:"F j, Y" }}</p>
+          <p class="mb-0">
+            <span class="badge {% if order.paid %}order-status-paid{% else %}order-status-pending{% endif %}">
+              {% if order.paid %}<i class="bi bi-check-circle"></i> Paid{% else %}<i class="bi bi-clock"></i> {{ order.get_status_display }}{% endif %}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <table class="table table-borderless receipt-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th class="text-center">Qty</th>
+            <th class="text-end">Price</th>
+            <th class="text-end">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items.all %}
+            <tr>
+              <td>{{ item.product.name }}</td>
+              <td class="text-center">{{ item.quantity }}</td>
+              <td class="text-end">{{ site_settings.currency }} {{ item.price|intcomma }}</td>
+              <td class="text-end fw-semibold">{{ site_settings.currency }} {{ item.get_cost|intcomma }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr class="receipt-total-row">
+            <td colspan="3" class="text-end fw-bold">Total</td>
+            <td class="text-end fw-bold" style="color:var(--primary);font-size:1.2rem;">
+              {{ site_settings.currency }} {{ order.get_total_cost|intcomma }}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="text-center text-muted small mt-4 pt-3 border-top">
+        <p class="mb-0">Thank you for your purchase!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-3 no-print">
+    <a href="{% url 'order_history' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Orders
+    </a>
+  </div>
+</div>
+{% endblock %}

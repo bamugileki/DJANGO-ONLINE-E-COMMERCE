@@ -41,6 +41,13 @@
                                 <span class="text-muted">Shipping to</span>
                                 <span class="fw-semibold text-truncate" style="max-width:150px;">{{ order.city }}</span>
                             </div>
+                            {% if order.paid %}
+                                <div class="mt-3">
+                                    <a href="{% url 'receipt_detail' order.id %}" class="btn btn-sm btn-success w-100">
+                                        <i class="bi bi-receipt"></i> Receipt
+                                    </a>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

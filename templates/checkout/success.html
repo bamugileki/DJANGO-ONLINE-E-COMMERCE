@@ -15,6 +15,9 @@
         </div>
         <p class="text-muted">A confirmation email has been sent to <span class="fw-bold">{{ order.email }}</span>.</p>
         <div class="d-flex justify-content-center gap-3 mt-4">
+            <a href="{% url 'receipt_detail' order.id %}" class="btn btn-success">
+                <i class="bi bi-receipt"></i> View Receipt
+            </a>
             <a href="{% url 'order_history' %}" class="btn btn-gradient">
                 <i class="bi bi-box"></i> View Orders
             </a>

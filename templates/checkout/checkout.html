@@ -8,10 +8,35 @@
 
     <div class="row g-4">
         <div class="col-lg-7 fade-in-up">
+            <div class="card-form mb-4">
+                <h5 class="fw-bold mb-4"><i class="bi bi-shield-check"></i> Face Verification</h5>
+                <p class="text-muted small">Verify your face to authorize this payment.</p>
+
+                <div class="position-relative rounded-4 overflow-hidden border border-2 mb-3 mx-auto" style="max-width:400px;aspect-ratio:4/3;background:#1a1a2e;">
+                    <div id="placeholderDiv" class="d-flex align-items-center justify-content-center h-100 text-white-50">
+                        <div>
+                            <i class="bi bi-camera" style="font-size:2.5rem;display:block;margin-bottom:0.5rem;"></i>
+                            <span>Camera preview</span>
+                        </div>
+                    </div>
+                    <video id="video" autoplay playsinline class="w-100 h-100 object-fit-cover d-none"></video>
+                    <canvas id="canvas" class="d-none"></canvas>
+                </div>
+
+                <button type="button" id="faceVerifyBtn" class="btn btn-outline-primary w-100 mb-2">
+                    <i class="bi bi-camera"></i> <span id="faceVerifyBtnText">Start Camera</span>
+                </button>
+
+                <div id="faceVerifyStatus" class="small text-center mb-3">
+                    <span id="faceVerifyMsg" class="text-muted">Face verification required to proceed with payment</span>
+                </div>
+            </div>
+
             <div class="card-form">
                 <h5 class="fw-bold mb-4"><i class="bi bi-pencil-square"></i> Shipping Details</h5>
-                <form method="post">
+                <form method="post" id="checkoutForm">
                     {% csrf_token %}
+                    <input type="hidden" name="face_proved" id="faceProvedInput" value="0">
                     <div class="row g-3">
                         <div class="col-sm-6">
                             <label for="first_name" class="form-label">First Name</label>
@@ -41,7 +66,7 @@
                     {% if stripe_error %}
                         <div class="alert alert-danger mt-3">{{ stripe_error }}</div>
                     {% endif %}
-                    <button type="submit" class="btn btn-gradient btn-lg w-100 mt-4 btn-sparkle">
+                    <button type="submit" id="payBtn" class="btn btn-gradient btn-lg w-100 mt-4 btn-sparkle" disabled>
                         <i class="bi bi-lock-fill"></i> Pay with Stripe
                     </button>
                 </form>
@@ -79,4 +104,119 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const faceVerifyBtn = document.getElementById("faceVerifyBtn");
+    const faceVerifyBtnText = document.getElementById("faceVerifyBtnText");
+    const faceVerifyMsg = document.getElementById("faceVerifyMsg");
+    const placeholderDiv = document.getElementById("placeholderDiv");
+    const faceProvedInput = document.getElementById("faceProvedInput");
+    const payBtn = document.getElementById("payBtn");
+    const checkoutForm = document.getElementById("checkoutForm");
+
+    let globalStream = null;
+    const csrfToken = "{{ csrf_token }}";
+    const alreadyVerified = {% if request.session.face_verified or request.session.login_method == 'face' %}true{% else %}false{% endif %};
+
+    if (alreadyVerified) {
+        faceProvedInput.value = "1";
+        payBtn.disabled = false;
+        faceVerifyBtn.disabled = true;
+        faceVerifyBtn.className = "btn btn-outline-success w-100 mb-2";
+        faceVerifyBtn.innerHTML = '<i class="bi bi-check-circle"></i> Verified';
+        faceVerifyMsg.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i> Face Verified — Payment Authorized';
+        faceVerifyMsg.className = "text-success fw-semibold";
+    }
+
+    function startCamera() {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+            .then(stream => {
+                globalStream = stream;
+                video.srcObject = stream;
+                video.classList.remove('d-none');
+                placeholderDiv.classList.add('d-none');
+                faceVerifyMsg.textContent = "Camera online — click Verify to authorize";
+                faceVerifyMsg.className = "text-primary fw-semibold";
+            })
+            .catch(err => {
+                console.error("Camera Error:", err);
+                faceVerifyMsg.textContent = "Camera access denied";
+                faceVerifyMsg.className = "text-danger fw-semibold";
+            });
+    }
+
+    function stopCamera() {
+        if (globalStream) {
+            globalStream.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+            video.classList.add('d-none');
+            placeholderDiv.classList.remove('d-none');
+            globalStream = null;
+        }
+    }
+
+    faceVerifyBtn.addEventListener("click", () => {
+        if (!globalStream) {
+            startCamera();
+            faceVerifyBtnText.textContent = "Verify Face";
+            faceVerifyBtn.innerHTML = '<i class="bi bi-shield-check"></i> <span id="faceVerifyBtnText">Verify Face</span>';
+            return;
+        }
+        if (!video.videoWidth) {
+            alert("Camera still starting up. Please wait.");
+            return;
+        }
+
+        const context = canvas.getContext("2d");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataURL = canvas.toDataURL("image/jpeg", 0.9);
+
+        faceVerifyMsg.textContent = "Verifying...";
+        faceVerifyMsg.className = "text-primary fw-semibold";
+        faceVerifyBtn.disabled = true;
+
+        fetch("{% url 'biometric_verify_descriptor' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+            body: JSON.stringify({ image: dataURL })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "ok") {
+                faceVerifyMsg.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i> Face Verified — Payment Authorized';
+                faceVerifyMsg.className = "text-success fw-semibold";
+                faceProvedInput.value = "1";
+                payBtn.disabled = false;
+                faceVerifyBtn.disabled = true;
+                faceVerifyBtn.className = "btn btn-outline-success w-100 mb-2";
+                faceVerifyBtn.innerHTML = '<i class="bi bi-check-circle"></i> Verified';
+                stopCamera();
+            } else {
+                faceVerifyMsg.textContent = data.message || "Verification failed — try again";
+                faceVerifyMsg.className = "text-danger fw-semibold";
+                faceVerifyBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            faceVerifyMsg.textContent = "Network error — try again";
+            faceVerifyMsg.className = "text-danger fw-semibold";
+            faceVerifyBtn.disabled = false;
+        });
+    });
+
+    checkoutForm.addEventListener("submit", function(e) {
+        if (faceProvedInput.value !== "1") {
+            e.preventDefault();
+            faceVerifyMsg.textContent = "Please verify your face before paying";
+            faceVerifyMsg.className = "text-danger fw-semibold";
+        }
+    });
+</script>
 {% endblock %}

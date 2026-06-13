@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.contrib import messages
 from cart.cart import Cart
 from orders.models import Order, OrderItem
+from payment.models import Transaction
 from cms.models import SiteSettings
 from activity.utils import log_activity
 
@@ -54,6 +55,7 @@ def checkout_view(request):
             address=request.POST['address'],
             postal_code=request.POST['postal_code'],
             city=request.POST['city'],
+            face_verified=request.session.get('face_verified', False) or request.session.get('login_method', '') == 'face',
         )
         for item in cart:
             OrderItem.objects.create(
@@ -99,7 +101,17 @@ def checkout_success(request, order_id):
     cart.clear()
     order.paid = True
     order.save()
-    log_activity(request, 'payment', model_name='Order', object_id=order.id, description=f'Order #{order.id} paid via Stripe')
+
+    Transaction.objects.create(
+        order=order,
+        user=request.user,
+        amount=order.get_total_cost(),
+        payment_method='stripe',
+        status='completed',
+        transaction_id=order.stripe_id,
+    )
+
+    log_activity(request, 'payment', model_name='Order', object_id=order.id, description=f'Order #{order.id} paid via Stripe (face_verified={order.face_verified})')
     login_method = request.session.get('login_method', '')
     if login_method != 'face':
         request.session['face_verified'] = False
