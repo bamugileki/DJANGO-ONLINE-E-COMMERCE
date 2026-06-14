@@ -126,22 +126,37 @@
     </div>
 </div>
 
-{% with admins=users|dictsortreversed:"date_joined" %}
 <div class="stat-summary fade-in-up">
     <div class="stat-item">
         <div class="num" style="color:#6c5ce7;">{{ users|length }}</div>
-        <div class="label">Total Users</div>
+        <div class="label">Filtered Users</div>
     </div>
     <div class="stat-item">
-        <div class="num" style="color:#00b894;">{{ users|dictsort:"is_active"|length }}</div>
+        <div class="num" style="color:#00b894;">{{ active_count }}</div>
         <div class="label">Active</div>
     </div>
     <div class="stat-item">
-        <div class="num" style="color:#e17055;">{{ users|dictsort:"date_joined"|slice:":5"|length }}</div>
+        <div class="num" style="color:#e17055;">{{ new_this_month }}</div>
         <div class="label">New This Month</div>
     </div>
 </div>
-{% endwith %}
+
+<form method="get" class="d-flex gap-2 mb-3 flex-wrap fade-in-up">
+    <div class="input-group" style="max-width:320px;">
+        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+        <input type="text" name="q" class="form-control" placeholder="Search name, email, username..." value="{{ search_query }}">
+    </div>
+    <select name="role" class="form-select" style="max-width:180px;" onchange="this.form.submit()">
+        <option value="">All Roles</option>
+        <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Admin</option>
+        <option value="manager" {% if role_filter == 'manager' %}selected{% endif %}>Manager</option>
+        <option value="vendor" {% if role_filter == 'vendor' %}selected{% endif %}>Vendor</option>
+        <option value="customer" {% if role_filter == 'customer' %}selected{% endif %}>Customer</option>
+    </select>
+    {% if search_query or role_filter %}
+    <a href="{% url 'manage_users' %}" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i> Clear</a>
+    {% endif %}
+</form>
 
 <div class="card card-modern fade-in-up">
     <div class="card-body p-0">

@@ -28,13 +28,13 @@
 
                 <div class="method-tabs">
                     {% if site_settings.login_method == 'both' or site_settings.login_method == 'face_only' %}
-                    <button class="tab-btn {% if site_settings.login_method != 'password_only' %}active{% endif %}" data-tab="face">
+                    <button class="tab-btn {% if site_settings.login_method == 'face_only' %}active{% endif %}" data-tab="face">
                         <i class="bi bi-camera-fill"></i>
                         <span>Face Login</span>
                     </button>
                     {% endif %}
                     {% if site_settings.login_method == 'both' or site_settings.login_method == 'password_only' %}
-                    <button class="tab-btn {% if site_settings.login_method == 'password_only' %}active{% endif %}" data-tab="password">
+                    <button class="tab-btn {% if site_settings.login_method != 'face_only' %}active{% endif %}" data-tab="password">
                         <i class="bi bi-key-fill"></i>
                         <span>Password</span>
                     </button>
@@ -42,7 +42,7 @@
                 </div>
 
                 {% if site_settings.login_method == 'both' or site_settings.login_method == 'face_only' %}
-                <div class="tab-content {% if site_settings.login_method != 'password_only' %}active{% endif %}" id="tab-face">
+                <div class="tab-content {% if site_settings.login_method == 'face_only' %}active{% endif %}" id="tab-face">
                     <div class="face-preview-wrap">
                         <div class="face-preview position-relative rounded-4 overflow-hidden border mx-auto" style="max-width:280px;aspect-ratio:4/3;background:#0f0f1a;">
                             <div id="placeholderDiv" class="d-flex align-items-center justify-content-center h-100 text-white-50">
@@ -76,7 +76,7 @@
                 {% endif %}
 
                 {% if site_settings.login_method == 'both' or site_settings.login_method == 'password_only' %}
-                <div class="tab-content {% if site_settings.login_method == 'password_only' %}active{% endif %}" id="tab-password">
+                <div class="tab-content {% if site_settings.login_method != 'face_only' %}active{% endif %}" id="tab-password">
                     {% if form.non_field_errors %}
                     <div class="alert alert-danger py-2 small shake" role="alert">
                         {% for error in form.non_field_errors %}

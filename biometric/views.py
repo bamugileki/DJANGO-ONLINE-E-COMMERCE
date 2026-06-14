@@ -23,6 +23,9 @@ from activity.utils import log_activity
 
 User = get_user_model()
 
+FACE_MATCH_TOLERANCE = 0.5
+MIN_SIMILARITY = 0.5
+
 try:
     from ultralytics import YOLO
     model_path = os.path.join(settings.BASE_DIR, 'biometric', 'Liveness_detection_models', 'best.pt')
@@ -35,7 +38,7 @@ except Exception as e:
 
 def _liveness_check(img):
     if liveness_model is None:
-        return True
+        return False
     results = liveness_model(img, stream=False, verbose=False)
     for r in results:
         for box in r.boxes:
@@ -92,8 +95,8 @@ def save_face_descriptor(request):
         return JsonResponse({'status': 'error', 'message': 'POST required'}, status=400)
     try:
         img = _decode_image(request)
-        # if not _liveness_check(img):
-        #     return JsonResponse({'status': 'error', 'message': 'Liveness verification failed. Access denied.'})
+        if not _liveness_check(img):
+            return JsonResponse({'status': 'error', 'message': 'Liveness verification failed. Access denied.'})
         encoding = _get_encoding_from_image(img)
         if encoding is None:
             return JsonResponse({'status': 'error', 'message': 'No face detected in the image.'})
@@ -124,8 +127,8 @@ def verify_face_descriptor(request):
         return JsonResponse({'status': 'error', 'message': 'POST required'}, status=400)
     try:
         img = _decode_image(request)
-        # if not _liveness_check(img):
-        #     return JsonResponse({'status': 'error', 'message': 'Liveness verification failed.'})
+        if not _liveness_check(img):
+            return JsonResponse({'status': 'error', 'message': 'Liveness verification failed. Access denied.'})
         live_encoding = _get_encoding_from_image(img)
         if live_encoding is None:
             return JsonResponse({'status': 'error', 'message': 'No face detected.'})
@@ -133,15 +136,15 @@ def verify_face_descriptor(request):
         if not stored or not stored.is_active:
             return JsonResponse({'status': 'error', 'message': 'No face enrolled.'})
         stored_encoding = pickle.loads(base64.b64decode(stored.embedding))
-        matches = face_recognition.compare_faces([stored_encoding], live_encoding)
         face_distance = face_recognition.face_distance([stored_encoding], live_encoding)
-        if matches[0]:
-            similarity = 1 - face_distance[0]
+        similarity = round(1 - face_distance[0], 4)
+        matches = face_recognition.compare_faces([stored_encoding], live_encoding, tolerance=FACE_MATCH_TOLERANCE)
+        if matches[0] and similarity >= MIN_SIMILARITY:
             request.session['face_verified'] = True
             log_activity(request, 'login', description='Face verification for transaction')
-            return JsonResponse({'status': 'ok', 'similarity': round(similarity, 4)})
+            return JsonResponse({'status': 'ok', 'similarity': similarity})
         else:
-            return JsonResponse({'status': 'error', 'message': 'Face does not match', 'similarity': round(1 - face_distance[0], 4)})
+            return JsonResponse({'status': 'error', 'message': 'Face does not match', 'similarity': similarity})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
@@ -165,19 +168,26 @@ def facial_login_verify(request):
         return JsonResponse({'status': 'error', 'message': 'POST required'}, status=400)
     try:
         img = _decode_image(request)
-        # if not _liveness_check(img):
-        #     return JsonResponse({'status': 'error', 'message': 'Liveness verification failed. Access denied.'})
+        if not _liveness_check(img):
+            return JsonResponse({'status': 'error', 'message': 'Liveness verification failed. Access denied.'})
         live_encoding = _get_encoding_from_image(img)
         if live_encoding is None:
             return JsonResponse({'status': 'error', 'message': 'No face detected.'})
         descriptors = FaceDescriptor.objects.filter(is_active=True).select_related('user')
         if not descriptors.exists():
             return JsonResponse({'status': 'error', 'message': 'No registered faces found. Please sign up first.'})
+        best_match = None
+        best_distance = float('inf')
         for desc in descriptors:
             stored_encoding = pickle.loads(base64.b64decode(desc.embedding))
-            matches = face_recognition.compare_faces([stored_encoding], live_encoding)
-            if matches[0]:
-                user = desc.user
+            distance = face_recognition.face_distance([stored_encoding], live_encoding)[0]
+            if distance < best_distance:
+                best_distance = distance
+                best_match = desc
+        if best_match is not None and best_distance <= FACE_MATCH_TOLERANCE:
+            similarity = round(1 - best_distance, 4)
+            if similarity >= MIN_SIMILARITY:
+                user = best_match.user
                 auth_login(request, user)
                 request.session['face_verified'] = True
                 request.session['login_method'] = 'face'
@@ -185,7 +195,8 @@ def facial_login_verify(request):
                 return JsonResponse({
                     'status': 'ok',
                     'redirect': '/',
-                    'username': user.username
+                    'username': user.username,
+                    'similarity': similarity,
                 })
         return JsonResponse({'status': 'error', 'message': 'Face does not match any registered user.'})
     except Exception as e:

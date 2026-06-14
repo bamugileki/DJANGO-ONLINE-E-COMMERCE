@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum, Count, Q
+from django.utils.timezone import now
 from django.apps import apps
 from django.forms import modelform_factory
 from django.db.models import FileField, ImageField, ManyToManyField
@@ -74,10 +75,33 @@ def vendor_reject(request, vendor_id):
 
 
 @login_required
-@role_required('admin', 'manager')
+@role_required('admin', 'manager', 'vendor')
 def manage_users(request):
     users = User.objects.select_related('profile').all()
-    return render(request, 'dashboard/manage_users.html', {'users': users})
+
+    role_filter = request.GET.get('role', '')
+    if role_filter:
+        users = users.filter(profile__role=role_filter)
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        users = users.filter(
+            Q(username__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query)
+        )
+
+    active_count = users.filter(is_active=True).count()
+    new_this_month = users.filter(date_joined__month=now().month, date_joined__year=now().year).count()
+
+    return render(request, 'dashboard/manage_users.html', {
+        'users': users,
+        'role_filter': role_filter,
+        'search_query': search_query,
+        'active_count': active_count,
+        'new_this_month': new_this_month,
+    })
 
 
 @login_required

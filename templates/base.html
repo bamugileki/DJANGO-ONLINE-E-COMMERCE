@@ -65,7 +65,7 @@
                             <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-bell-fill"></i>
                                 {% if unread_notifications_count %}
-                                <span class="badge badge-cart position-absolute top-0 start-100 translate-middle rounded-pill" style="font-size:0.6rem;">
+                                <span id="notifBadge" class="badge badge-cart position-absolute top-0 start-100 translate-middle rounded-pill" style="font-size:0.6rem;">
                                     {{ unread_notifications_count }}
                                 </span>
                                 {% endif %}
@@ -76,7 +76,7 @@
                                 </li>
                                 {% for n in recent_notifications %}
                                 <li>
-                                    <a class="dropdown-item px-3 py-2 {% if not n.is_read %}" style="background:#f8f7ff;font-weight:600;{% endif %}" href="{% if n.link %}{{ n.link }}{% else %}#{% endif %}">
+                                    <a class="dropdown-item px-3 py-2 notify-item {% if not n.is_read %}" style="background:#f8f7ff;font-weight:600;{% endif %}" href="{% if n.link %}{{ n.link }}{% else %}#{% endif %}" data-notify-id="{{ n.id }}">
                                         <div class="d-flex align-items-start gap-2">
                                             <span class="mt-1" style="font-size:1.2rem;">
                                                 {% if n.notification_type == 'order' %}<i class="bi bi-truck" style="color:#6c5ce7;"></i>
@@ -101,7 +101,7 @@
                                 </li>
                                 {% endfor %}
                                 <li class="border-top">
-                                    <a class="dropdown-item text-center py-2" href="#" style="font-size:0.82rem;color:#6c5ce7;font-weight:600;border-radius:0 0 16px 16px;">
+                                    <a class="dropdown-item text-center py-2" href="#" id="markAllRead" style="font-size:0.82rem;color:#6c5ce7;font-weight:600;border-radius:0 0 16px 16px;">
                                         Mark all as read
                                     </a>
                                 </li>
@@ -225,6 +225,46 @@
             cards.forEach(card => {
                 card.style.animationPlayState = 'paused';
                 observer.observe(card);
+            });
+        });
+
+        function getCookie(name) {
+            let c = document.cookie.split('; ').find(r => r.startsWith(name + '='));
+            return c ? decodeURIComponent(c.split('=')[1]) : '';
+        }
+
+        document.querySelectorAll('.notify-item').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                var id = this.dataset.notifyId;
+                if (!id) return;
+                e.preventDefault();
+                var href = this.getAttribute('href') || '#';
+                fetch('/notifications/mark-read/' + id + '/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                }).then(function() {
+                    window.location.href = href;
+                }).catch(function() {
+                    window.location.href = href;
+                });
+            });
+        });
+
+        document.getElementById('markAllRead')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            var btn = this;
+            fetch('/notifications/mark-all-read/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') }
+            }).then(function(r) { return r.json(); }).then(function(data) {
+                if (data.status === 'ok') {
+                    var badge = document.getElementById('notifBadge');
+                    if (badge) badge.remove();
+                    document.querySelectorAll('.notify-item').forEach(function(item) {
+                        item.style.background = '';
+                        item.style.fontWeight = '';
+                    });
+                }
             });
         });
     </script>

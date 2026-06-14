@@ -76,6 +76,7 @@ def contact_detail(request, pk):
     msg = get_object_or_404(ContactMessage, pk=pk)
     msg.is_read = True
     msg.save()
+    Notification.objects.filter(user=request.user, link=reverse('support_contact_detail', args=[pk]), is_read=False).update(is_read=True)
 
     if request.method == 'POST':
         reply_text = request.POST.get('message', '').strip()
